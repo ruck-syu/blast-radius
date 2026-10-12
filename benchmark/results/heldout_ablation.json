@@ -1,0 +1,394 @@
+{
+  "org": "heldout",
+  "n_questions": 27,
+  "writer": "proxy",
+  "ablated": true,
+  "systems": [
+    {
+      "system": "agent-parameterized-tools",
+      "rows": [
+        {
+          "id": "heldout-01",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-02",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-03",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-04",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-05",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-06",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-07",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-08",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-09",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-10",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-11",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-12",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-13",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-14",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-15",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-16",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-17",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-18",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-19",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-20",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-21",
+          "group": "4-6-hop",
+          "kind": "path",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-22",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-23",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-24",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-25",
+          "group": "counterfactual",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-26",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-27",
+          "group": "counterfactual",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.0,
+            "error": true
+          },
+          "error": "RuntimeError: graph unavailable (ablation: FalkorDB removed)",
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        }
+      ],
+      "aggregate": {
+        "n": 27,
+        "overall": 0.0,
+        "1-hop": 0.0,
+        "2-3-hop": 0.0,
+        "4-6-hop": 0.0,
+        "counterfactual": 0.0,
+        "scalar": {
+          "n": 13,
+          "primary": 0.0
+        },
+        "set": {
+          "n": 10,
+          "primary": 0.0
+        },
+        "ranked": {
+          "n": 3,
+          "primary": 0.0
+        },
+        "path": {
+          "n": 1,
+          "primary": 0.0
+        },
+        "avg_calls": 1.3,
+        "avg_wall_ms": 0.0,
+        "errors": 27
+      },
+      "total_calls": 34,
+      "total_tool_latency_ms": 0.0,
+      "used_llm": false
+    }
+  ]
+}

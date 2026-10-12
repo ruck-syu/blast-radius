@@ -1,0 +1,706 @@
+{
+  "dev": {
+    "org": "dev",
+    "seed": 42,
+    "cves": {
+      "CVE-2021-44228": {
+        "affected": [
+          {
+            "service": "d-checkout-api-2",
+            "depth": 2
+          },
+          {
+            "service": "d-invoice-gen-2",
+            "depth": 2
+          },
+          {
+            "service": "d-media-proxy-2",
+            "depth": 2
+          },
+          {
+            "service": "d-notify-svc-2",
+            "depth": 2
+          },
+          {
+            "service": "d-checkout-api",
+            "depth": 3
+          },
+          {
+            "service": "d-invoice-gen",
+            "depth": 3
+          },
+          {
+            "service": "d-notify-svc",
+            "depth": 3
+          },
+          {
+            "service": "d-notify-svc-3",
+            "depth": 3
+          },
+          {
+            "service": "d-checkout-api-3",
+            "depth": 4
+          },
+          {
+            "service": "d-invoice-gen-3",
+            "depth": 4
+          },
+          {
+            "service": "d-media-proxy",
+            "depth": 4
+          },
+          {
+            "service": "d-recommend-api-2",
+            "depth": 4
+          },
+          {
+            "service": "d-media-proxy-3",
+            "depth": 5
+          },
+          {
+            "service": "d-recommend-api",
+            "depth": 5
+          },
+          {
+            "service": "d-recommend-api-3",
+            "depth": 5
+          }
+        ],
+        "reachable": [
+          {
+            "service": "d-checkout-api-2",
+            "depth": 2,
+            "entries": [
+              "d-checkout-api-2"
+            ]
+          },
+          {
+            "service": "d-invoice-gen-2",
+            "depth": 2,
+            "entries": [
+              "d-cache-warmer-3"
+            ]
+          },
+          {
+            "service": "d-media-proxy-2",
+            "depth": 2,
+            "entries": [
+              "d-user-profile-2"
+            ]
+          },
+          {
+            "service": "d-checkout-api",
+            "depth": 3,
+            "entries": [
+              "d-feature-flags-2",
+              "d-user-profile-2",
+              "d-ledger-api",
+              "d-webhook-relay-2",
+              "d-session-store-3",
+              "d-checkout-api-2",
+              "d-cache-warmer-3",
+              "d-feed-indexer-2"
+            ]
+          },
+          {
+            "service": "d-invoice-gen",
+            "depth": 3,
+            "entries": [
+              "d-user-profile-2",
+              "d-invoice-gen"
+            ]
+          },
+          {
+            "service": "d-recommend-api",
+            "depth": 5,
+            "entries": [
+              "d-user-profile-2"
+            ]
+          }
+        ]
+      },
+      "CVE-2024-3094": {
+        "affected": [
+          {
+            "service": "d-audit-trail-3",
+            "depth": 2
+          },
+          {
+            "service": "d-billing-worker",
+            "depth": 2
+          },
+          {
+            "service": "d-billing-worker-2",
+            "depth": 2
+          },
+          {
+            "service": "d-ledger-api",
+            "depth": 2
+          },
+          {
+            "service": "d-ledger-api-2",
+            "depth": 2
+          },
+          {
+            "service": "d-ledger-api-3",
+            "depth": 2
+          },
+          {
+            "service": "d-session-store",
+            "depth": 2
+          },
+          {
+            "service": "d-session-store-3",
+            "depth": 2
+          },
+          {
+            "service": "d-audit-trail",
+            "depth": 3
+          },
+          {
+            "service": "d-cache-warmer-2",
+            "depth": 3
+          },
+          {
+            "service": "d-billing-worker-3",
+            "depth": 4
+          },
+          {
+            "service": "d-cache-warmer",
+            "depth": 4
+          },
+          {
+            "service": "d-cache-warmer-3",
+            "depth": 4
+          },
+          {
+            "service": "d-session-store-2",
+            "depth": 4
+          },
+          {
+            "service": "d-audit-trail-2",
+            "depth": 5
+          }
+        ],
+        "reachable": [
+          {
+            "service": "d-billing-worker",
+            "depth": 2,
+            "entries": [
+              "d-feature-flags-2",
+              "d-ledger-api",
+              "d-webhook-relay-2",
+              "d-session-store-3",
+              "d-cache-warmer-3",
+              "d-feed-indexer-2"
+            ]
+          },
+          {
+            "service": "d-ledger-api",
+            "depth": 2,
+            "entries": [
+              "d-ledger-api",
+              "d-webhook-relay-2",
+              "d-session-store-3"
+            ]
+          },
+          {
+            "service": "d-ledger-api-2",
+            "depth": 2,
+            "entries": [
+              "d-user-profile-2"
+            ]
+          },
+          {
+            "service": "d-session-store-3",
+            "depth": 2,
+            "entries": [
+              "d-session-store-3"
+            ]
+          },
+          {
+            "service": "d-cache-warmer-3",
+            "depth": 4,
+            "entries": [
+              "d-cache-warmer-3"
+            ]
+          },
+          {
+            "service": "d-session-store-2",
+            "depth": 4,
+            "entries": [
+              "d-webhook-relay-2",
+              "d-session-store-3"
+            ]
+          }
+        ]
+      },
+      "CVE-2017-5638": {
+        "affected": [
+          {
+            "service": "d-feature-flags",
+            "depth": 2
+          },
+          {
+            "service": "d-feature-flags-2",
+            "depth": 2
+          },
+          {
+            "service": "d-feature-flags-3",
+            "depth": 2
+          },
+          {
+            "service": "d-webhook-relay-2",
+            "depth": 2
+          },
+          {
+            "service": "d-auth-gateway",
+            "depth": 3
+          },
+          {
+            "service": "d-auth-gateway-2",
+            "depth": 3
+          },
+          {
+            "service": "d-risk-engine",
+            "depth": 3
+          },
+          {
+            "service": "d-risk-engine-3",
+            "depth": 3
+          },
+          {
+            "service": "d-webhook-relay",
+            "depth": 3
+          },
+          {
+            "service": "d-auth-gateway-3",
+            "depth": 4
+          },
+          {
+            "service": "d-pricing-api-2",
+            "depth": 4
+          },
+          {
+            "service": "d-risk-engine-2",
+            "depth": 4
+          },
+          {
+            "service": "d-webhook-relay-3",
+            "depth": 4
+          },
+          {
+            "service": "d-pricing-api",
+            "depth": 5
+          },
+          {
+            "service": "d-pricing-api-3",
+            "depth": 5
+          }
+        ],
+        "reachable": [
+          {
+            "service": "d-feature-flags",
+            "depth": 2,
+            "entries": [
+              "d-cache-warmer-3"
+            ]
+          },
+          {
+            "service": "d-feature-flags-2",
+            "depth": 2,
+            "entries": [
+              "d-feature-flags-2"
+            ]
+          },
+          {
+            "service": "d-webhook-relay-2",
+            "depth": 2,
+            "entries": [
+              "d-webhook-relay-2"
+            ]
+          },
+          {
+            "service": "d-risk-engine",
+            "depth": 3,
+            "entries": [
+              "d-webhook-relay-2",
+              "d-session-store-3"
+            ]
+          }
+        ]
+      }
+    },
+    "best_fix": {
+      "cve": "CVE-2021-44228",
+      "reachable_removed": 6
+    },
+    "counts": {
+      "packages": 22006,
+      "services": 60
+    }
+  },
+  "heldout": {
+    "org": "heldout",
+    "seed": 1337,
+    "cves": {
+      "CVE-2021-44228": {
+        "affected": [
+          {
+            "service": "h-checkout-api-2",
+            "depth": 2
+          },
+          {
+            "service": "h-checkout-api-3",
+            "depth": 2
+          },
+          {
+            "service": "h-invoice-gen",
+            "depth": 2
+          },
+          {
+            "service": "h-media-proxy",
+            "depth": 2
+          },
+          {
+            "service": "h-notify-svc-3",
+            "depth": 2
+          },
+          {
+            "service": "h-recommend-api",
+            "depth": 2
+          },
+          {
+            "service": "h-checkout-api",
+            "depth": 3
+          },
+          {
+            "service": "h-media-proxy-2",
+            "depth": 3
+          },
+          {
+            "service": "h-notify-svc-2",
+            "depth": 3
+          },
+          {
+            "service": "h-recommend-api-2",
+            "depth": 3
+          },
+          {
+            "service": "h-recommend-api-3",
+            "depth": 3
+          },
+          {
+            "service": "h-invoice-gen-2",
+            "depth": 4
+          },
+          {
+            "service": "h-invoice-gen-3",
+            "depth": 4
+          },
+          {
+            "service": "h-media-proxy-3",
+            "depth": 4
+          },
+          {
+            "service": "h-notify-svc",
+            "depth": 4
+          }
+        ],
+        "reachable": [
+          {
+            "service": "h-checkout-api-2",
+            "depth": 2,
+            "entries": [
+              "h-checkout-api-2"
+            ]
+          },
+          {
+            "service": "h-recommend-api",
+            "depth": 2,
+            "entries": [
+              "h-checkout-api-2"
+            ]
+          },
+          {
+            "service": "h-checkout-api",
+            "depth": 3,
+            "entries": [
+              "h-checkout-api",
+              "h-billing-worker",
+              "h-search-api",
+              "h-billing-worker-3",
+              "h-audit-trail",
+              "h-risk-engine-3",
+              "h-feed-indexer-3",
+              "h-checkout-api-2",
+              "h-billing-worker-2",
+              "h-recommend-api-3"
+            ]
+          },
+          {
+            "service": "h-recommend-api-2",
+            "depth": 3,
+            "entries": [
+              "h-billing-worker-3"
+            ]
+          },
+          {
+            "service": "h-recommend-api-3",
+            "depth": 3,
+            "entries": [
+              "h-recommend-api-3"
+            ]
+          },
+          {
+            "service": "h-notify-svc",
+            "depth": 4,
+            "entries": [
+              "h-audit-trail",
+              "h-feed-indexer-3"
+            ]
+          }
+        ]
+      },
+      "CVE-2024-3094": {
+        "affected": [
+          {
+            "service": "h-audit-trail-3",
+            "depth": 2
+          },
+          {
+            "service": "h-billing-worker-3",
+            "depth": 2
+          },
+          {
+            "service": "h-ledger-api-3",
+            "depth": 2
+          },
+          {
+            "service": "h-session-store-2",
+            "depth": 2
+          },
+          {
+            "service": "h-audit-trail",
+            "depth": 3
+          },
+          {
+            "service": "h-billing-worker",
+            "depth": 3
+          },
+          {
+            "service": "h-billing-worker-2",
+            "depth": 3
+          },
+          {
+            "service": "h-cache-warmer-2",
+            "depth": 3
+          },
+          {
+            "service": "h-cache-warmer-3",
+            "depth": 3
+          },
+          {
+            "service": "h-ledger-api-2",
+            "depth": 3
+          },
+          {
+            "service": "h-session-store",
+            "depth": 3
+          },
+          {
+            "service": "h-session-store-3",
+            "depth": 3
+          },
+          {
+            "service": "h-audit-trail-2",
+            "depth": 4
+          },
+          {
+            "service": "h-cache-warmer",
+            "depth": 4
+          },
+          {
+            "service": "h-ledger-api",
+            "depth": 4
+          }
+        ],
+        "reachable": [
+          {
+            "service": "h-billing-worker-3",
+            "depth": 2,
+            "entries": [
+              "h-billing-worker-3"
+            ]
+          },
+          {
+            "service": "h-audit-trail",
+            "depth": 3,
+            "entries": [
+              "h-audit-trail",
+              "h-feed-indexer-3"
+            ]
+          },
+          {
+            "service": "h-billing-worker",
+            "depth": 3,
+            "entries": [
+              "h-billing-worker",
+              "h-search-api",
+              "h-billing-worker-3",
+              "h-audit-trail",
+              "h-risk-engine-3",
+              "h-feed-indexer-3",
+              "h-checkout-api-2",
+              "h-recommend-api-3"
+            ]
+          },
+          {
+            "service": "h-billing-worker-2",
+            "depth": 3,
+            "entries": [
+              "h-billing-worker-2"
+            ]
+          },
+          {
+            "service": "h-ledger-api",
+            "depth": 4,
+            "entries": [
+              "h-risk-engine-3"
+            ]
+          }
+        ]
+      },
+      "CVE-2017-5638": {
+        "affected": [
+          {
+            "service": "h-risk-engine-3",
+            "depth": 2
+          },
+          {
+            "service": "h-auth-gateway",
+            "depth": 3
+          },
+          {
+            "service": "h-auth-gateway-3",
+            "depth": 3
+          },
+          {
+            "service": "h-feature-flags",
+            "depth": 3
+          },
+          {
+            "service": "h-feature-flags-2",
+            "depth": 3
+          },
+          {
+            "service": "h-pricing-api",
+            "depth": 3
+          },
+          {
+            "service": "h-risk-engine",
+            "depth": 3
+          },
+          {
+            "service": "h-risk-engine-2",
+            "depth": 3
+          },
+          {
+            "service": "h-webhook-relay",
+            "depth": 3
+          },
+          {
+            "service": "h-webhook-relay-2",
+            "depth": 3
+          },
+          {
+            "service": "h-webhook-relay-3",
+            "depth": 3
+          },
+          {
+            "service": "h-auth-gateway-2",
+            "depth": 4
+          },
+          {
+            "service": "h-feature-flags-3",
+            "depth": 4
+          },
+          {
+            "service": "h-pricing-api-2",
+            "depth": 4
+          },
+          {
+            "service": "h-pricing-api-3",
+            "depth": 4
+          }
+        ],
+        "reachable": [
+          {
+            "service": "h-risk-engine-3",
+            "depth": 2,
+            "entries": [
+              "h-risk-engine-3"
+            ]
+          },
+          {
+            "service": "h-auth-gateway",
+            "depth": 3,
+            "entries": [
+              "h-search-api",
+              "h-billing-worker-3",
+              "h-audit-trail",
+              "h-risk-engine-3",
+              "h-feed-indexer-3",
+              "h-checkout-api-2"
+            ]
+          },
+          {
+            "service": "h-pricing-api",
+            "depth": 3,
+            "entries": [
+              "h-audit-trail",
+              "h-feed-indexer-3"
+            ]
+          },
+          {
+            "service": "h-risk-engine",
+            "depth": 3,
+            "entries": [
+              "h-audit-trail",
+              "h-feed-indexer-3"
+            ]
+          },
+          {
+            "service": "h-webhook-relay",
+            "depth": 3,
+            "entries": [
+              "h-recommend-api-3"
+            ]
+          },
+          {
+            "service": "h-webhook-relay-3",
+            "depth": 3,
+            "entries": [
+              "h-webhook-relay-3"
+            ]
+          },
+          {
+            "service": "h-auth-gateway-2",
+            "depth": 4,
+            "entries": [
+              "h-recommend-api-3"
+            ]
+          }
+        ]
+      }
+    },
+    "best_fix": {
+      "cve": "CVE-2017-5638",
+      "reachable_removed": 7
+    },
+    "counts": {
+      "packages": 22006,
+      "services": 60
+    }
+  }
+}

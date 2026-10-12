@@ -1,0 +1,543 @@
+[
+  {
+    "id": "heldout-01",
+    "org": "heldout",
+    "group": "1-hop",
+    "kind": "scalar",
+    "text": "Which team owns h-checkout-api?",
+    "expected": {
+      "value": "Team Nebula (heldout)"
+    },
+    "params": {
+      "service": "h-checkout-api",
+      "field": "team"
+    }
+  },
+  {
+    "id": "heldout-02",
+    "org": "heldout",
+    "group": "1-hop",
+    "kind": "scalar",
+    "text": "Who last deployed h-checkout-api?",
+    "expected": {
+      "value": "Nico Frost"
+    },
+    "params": {
+      "service": "h-checkout-api",
+      "field": "deployer"
+    }
+  },
+  {
+    "id": "heldout-03",
+    "org": "heldout",
+    "group": "1-hop",
+    "kind": "scalar",
+    "text": "Is h-checkout-api affected by CVE-2021-44228? yes/no",
+    "expected": {
+      "value": "yes"
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "service": "h-checkout-api",
+      "field": "affected_yn"
+    }
+  },
+  {
+    "id": "heldout-04",
+    "org": "heldout",
+    "group": "1-hop",
+    "kind": "scalar",
+    "text": "Is h-data-export affected by CVE-2021-44228? yes/no",
+    "expected": {
+      "value": "no"
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "service": "h-data-export",
+      "field": "affected_yn"
+    }
+  },
+  {
+    "id": "heldout-05",
+    "org": "heldout",
+    "group": "1-hop",
+    "kind": "scalar",
+    "text": "How many services does CVE-2021-44228 affect?",
+    "expected": {
+      "value": 15
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "field": "affected_count"
+    }
+  },
+  {
+    "id": "heldout-06",
+    "org": "heldout",
+    "group": "1-hop",
+    "kind": "scalar",
+    "text": "What tier is h-checkout-api?",
+    "expected": {
+      "value": "critical"
+    },
+    "params": {
+      "service": "h-checkout-api",
+      "field": "tier"
+    }
+  },
+  {
+    "id": "heldout-07",
+    "org": "heldout",
+    "group": "2-3-hop",
+    "kind": "set",
+    "text": "Services affected by CVE-2021-44228 within 3 hops?",
+    "expected": {
+      "values": [
+        "h-checkout-api",
+        "h-checkout-api-2",
+        "h-checkout-api-3",
+        "h-invoice-gen",
+        "h-media-proxy",
+        "h-media-proxy-2",
+        "h-notify-svc-2",
+        "h-notify-svc-3",
+        "h-recommend-api",
+        "h-recommend-api-2",
+        "h-recommend-api-3"
+      ]
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "field": "affected_maxdepth",
+      "max_depth": 3
+    }
+  },
+  {
+    "id": "heldout-08",
+    "org": "heldout",
+    "group": "2-3-hop",
+    "kind": "scalar",
+    "text": "Is h-checkout-api reachable from a public endpoint? yes/no",
+    "expected": {
+      "value": "yes"
+    },
+    "params": {
+      "service": "h-checkout-api",
+      "field": "reachable_yn"
+    }
+  },
+  {
+    "id": "heldout-09",
+    "org": "heldout",
+    "group": "2-3-hop",
+    "kind": "set",
+    "text": "Which entry services expose h-checkout-api?",
+    "expected": {
+      "values": [
+        "h-audit-trail",
+        "h-billing-worker",
+        "h-billing-worker-2",
+        "h-billing-worker-3",
+        "h-checkout-api",
+        "h-checkout-api-2",
+        "h-feed-indexer-3",
+        "h-recommend-api-3",
+        "h-risk-engine-3",
+        "h-search-api"
+      ]
+    },
+    "params": {
+      "service": "h-checkout-api",
+      "field": "entry_services"
+    }
+  },
+  {
+    "id": "heldout-10",
+    "org": "heldout",
+    "group": "2-3-hop",
+    "kind": "scalar",
+    "text": "Shortest dependency depth from CVE-2021-44228 to h-checkout-api?",
+    "expected": {
+      "value": 3
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "service": "h-checkout-api",
+      "field": "depth"
+    }
+  },
+  {
+    "id": "heldout-11",
+    "org": "heldout",
+    "group": "2-3-hop",
+    "kind": "set",
+    "text": "Which CVE-2021-44228-affected services are publicly reachable?",
+    "expected": {
+      "values": [
+        "h-checkout-api",
+        "h-checkout-api-2",
+        "h-notify-svc",
+        "h-recommend-api",
+        "h-recommend-api-2",
+        "h-recommend-api-3"
+      ]
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "field": "reachable_set"
+    }
+  },
+  {
+    "id": "heldout-12",
+    "org": "heldout",
+    "group": "2-3-hop",
+    "kind": "set",
+    "text": "CVE-2021-44228-affected services owned by Team Nebula (heldout)?",
+    "expected": {
+      "values": [
+        "h-checkout-api",
+        "h-invoice-gen",
+        "h-media-proxy-3",
+        "h-notify-svc-2",
+        "h-recommend-api-2"
+      ]
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "field": "team_affected",
+      "team": "Team Nebula (heldout)"
+    }
+  },
+  {
+    "id": "heldout-13",
+    "org": "heldout",
+    "group": "2-3-hop",
+    "kind": "set",
+    "text": "Which CVEs affect h-checkout-api?",
+    "expected": {
+      "values": [
+        "CVE-2021-44228"
+      ]
+    },
+    "params": {
+      "service": "h-checkout-api",
+      "field": "cves_for_service"
+    }
+  },
+  {
+    "id": "heldout-14",
+    "org": "heldout",
+    "group": "2-3-hop",
+    "kind": "scalar",
+    "text": "Dependency depth from CVE-2024-3094 to h-audit-trail-2?",
+    "expected": {
+      "value": 4
+    },
+    "params": {
+      "cve": "CVE-2024-3094",
+      "service": "h-audit-trail-2",
+      "field": "depth"
+    }
+  },
+  {
+    "id": "heldout-15",
+    "org": "heldout",
+    "group": "4-6-hop",
+    "kind": "set",
+    "text": "All services affected by CVE-2021-44228?",
+    "expected": {
+      "values": [
+        "h-checkout-api",
+        "h-checkout-api-2",
+        "h-checkout-api-3",
+        "h-invoice-gen",
+        "h-invoice-gen-2",
+        "h-invoice-gen-3",
+        "h-media-proxy",
+        "h-media-proxy-2",
+        "h-media-proxy-3",
+        "h-notify-svc",
+        "h-notify-svc-2",
+        "h-notify-svc-3",
+        "h-recommend-api",
+        "h-recommend-api-2",
+        "h-recommend-api-3"
+      ]
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "field": "affected_set"
+    }
+  },
+  {
+    "id": "heldout-16",
+    "org": "heldout",
+    "group": "4-6-hop",
+    "kind": "set",
+    "text": "All publicly reachable CVE-2021-44228-affected services?",
+    "expected": {
+      "values": [
+        "h-checkout-api",
+        "h-checkout-api-2",
+        "h-notify-svc",
+        "h-recommend-api",
+        "h-recommend-api-2",
+        "h-recommend-api-3"
+      ]
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "field": "reachable_set"
+    }
+  },
+  {
+    "id": "heldout-17",
+    "org": "heldout",
+    "group": "4-6-hop",
+    "kind": "ranked",
+    "text": "Top 3 riskiest services for CVE-2021-44228?",
+    "expected": {
+      "k": 3,
+      "relevant": [
+        "h-checkout-api",
+        "h-checkout-api-2",
+        "h-notify-svc",
+        "h-recommend-api",
+        "h-recommend-api-2",
+        "h-recommend-api-3"
+      ]
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "field": "top_k",
+      "k": 3
+    }
+  },
+  {
+    "id": "heldout-18",
+    "org": "heldout",
+    "group": "4-6-hop",
+    "kind": "ranked",
+    "text": "Top 5 riskiest services for CVE-2021-44228?",
+    "expected": {
+      "k": 5,
+      "relevant": [
+        "h-checkout-api",
+        "h-checkout-api-2",
+        "h-notify-svc",
+        "h-recommend-api",
+        "h-recommend-api-2",
+        "h-recommend-api-3"
+      ]
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "field": "top_k",
+      "k": 5
+    }
+  },
+  {
+    "id": "heldout-19",
+    "org": "heldout",
+    "group": "4-6-hop",
+    "kind": "set",
+    "text": "Deepest CVE-2021-44228-affected service(s)? (with depth)",
+    "expected": {
+      "values": [
+        "h-invoice-gen-2",
+        "h-invoice-gen-3",
+        "h-media-proxy-3",
+        "h-notify-svc"
+      ],
+      "depth": 4
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "field": "deepest"
+    }
+  },
+  {
+    "id": "heldout-20",
+    "org": "heldout",
+    "group": "4-6-hop",
+    "kind": "set",
+    "text": "All affected services across all CVEs?",
+    "expected": {
+      "values": [
+        "h-audit-trail",
+        "h-audit-trail-2",
+        "h-audit-trail-3",
+        "h-auth-gateway",
+        "h-auth-gateway-2",
+        "h-auth-gateway-3",
+        "h-billing-worker",
+        "h-billing-worker-2",
+        "h-billing-worker-3",
+        "h-cache-warmer",
+        "h-cache-warmer-2",
+        "h-cache-warmer-3",
+        "h-checkout-api",
+        "h-checkout-api-2",
+        "h-checkout-api-3",
+        "h-feature-flags",
+        "h-feature-flags-2",
+        "h-feature-flags-3",
+        "h-invoice-gen",
+        "h-invoice-gen-2",
+        "h-invoice-gen-3",
+        "h-ledger-api",
+        "h-ledger-api-2",
+        "h-ledger-api-3",
+        "h-media-proxy",
+        "h-media-proxy-2",
+        "h-media-proxy-3",
+        "h-notify-svc",
+        "h-notify-svc-2",
+        "h-notify-svc-3",
+        "h-pricing-api",
+        "h-pricing-api-2",
+        "h-pricing-api-3",
+        "h-recommend-api",
+        "h-recommend-api-2",
+        "h-recommend-api-3",
+        "h-risk-engine",
+        "h-risk-engine-2",
+        "h-risk-engine-3",
+        "h-session-store",
+        "h-session-store-2",
+        "h-session-store-3",
+        "h-webhook-relay",
+        "h-webhook-relay-2",
+        "h-webhook-relay-3"
+      ]
+    },
+    "params": {
+      "field": "affected_union"
+    }
+  },
+  {
+    "id": "heldout-21",
+    "org": "heldout",
+    "group": "4-6-hop",
+    "kind": "path",
+    "text": "Proof path from CVE-2021-44228 to h-invoice-gen-2?",
+    "expected": {
+      "start": "h-invoice-gen-2",
+      "end_purl": "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1",
+      "depth": 4
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "service": "h-invoice-gen-2",
+      "field": "proof_path"
+    }
+  },
+  {
+    "id": "heldout-22",
+    "org": "heldout",
+    "group": "counterfactual",
+    "kind": "scalar",
+    "text": "If CVE-2021-44228 is fixed, how many reachable affected services remain org-wide?",
+    "expected": {
+      "value": 12
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "field": "reachable_after_fix"
+    }
+  },
+  {
+    "id": "heldout-23",
+    "org": "heldout",
+    "group": "counterfactual",
+    "kind": "scalar",
+    "text": "Which single fix removes the most reachable services?",
+    "expected": {
+      "value": "CVE-2017-5638"
+    },
+    "params": {
+      "field": "best_fix"
+    }
+  },
+  {
+    "id": "heldout-24",
+    "org": "heldout",
+    "group": "counterfactual",
+    "kind": "scalar",
+    "text": "How many reachable services does fixing CVE-2021-44228 remove?",
+    "expected": {
+      "value": 6
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "field": "reachable_removed"
+    }
+  },
+  {
+    "id": "heldout-25",
+    "org": "heldout",
+    "group": "counterfactual",
+    "kind": "set",
+    "text": "Services affected by CVE-2021-44228 but NOT by CVE-2024-3094?",
+    "expected": {
+      "values": [
+        "h-checkout-api",
+        "h-checkout-api-2",
+        "h-checkout-api-3",
+        "h-invoice-gen",
+        "h-invoice-gen-2",
+        "h-invoice-gen-3",
+        "h-media-proxy",
+        "h-media-proxy-2",
+        "h-media-proxy-3",
+        "h-notify-svc",
+        "h-notify-svc-2",
+        "h-notify-svc-3",
+        "h-recommend-api",
+        "h-recommend-api-2",
+        "h-recommend-api-3"
+      ]
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "other": "CVE-2024-3094",
+      "field": "set_difference"
+    }
+  },
+  {
+    "id": "heldout-26",
+    "org": "heldout",
+    "group": "counterfactual",
+    "kind": "scalar",
+    "text": "If CVE-2024-3094 is fixed, how many CVE-2021-44228-affected services remain?",
+    "expected": {
+      "value": 15
+    },
+    "params": {
+      "cve": "CVE-2021-44228",
+      "other": "CVE-2024-3094",
+      "field": "affected_after_other_fix"
+    }
+  },
+  {
+    "id": "heldout-27",
+    "org": "heldout",
+    "group": "counterfactual",
+    "kind": "ranked",
+    "text": "Rank the 3 CVE fixes by reachable services removed?",
+    "expected": {
+      "k": 1,
+      "relevant": [
+        "CVE-2017-5638"
+      ],
+      "full_order": [
+        "CVE-2017-5638",
+        "CVE-2021-44228",
+        "CVE-2024-3094"
+      ]
+    },
+    "params": {
+      "field": "fix_ranking"
+    }
+  }
+]

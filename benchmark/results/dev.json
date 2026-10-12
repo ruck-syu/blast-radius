@@ -1,0 +1,1292 @@
+{
+  "org": "dev",
+  "n_questions": 27,
+  "writer": "proxy",
+  "ablated": false,
+  "systems": [
+    {
+      "system": "agent-parameterized-tools",
+      "rows": [
+        {
+          "id": "dev-01",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 9.5,
+          "wall_ms": 9.5
+        },
+        {
+          "id": "dev-02",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.1,
+          "wall_ms": 4.1
+        },
+        {
+          "id": "dev-03",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.4,
+          "wall_ms": 4.4
+        },
+        {
+          "id": "dev-04",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 2.7,
+          "wall_ms": 2.7
+        },
+        {
+          "id": "dev-05",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 11.9,
+          "wall_ms": 11.9
+        },
+        {
+          "id": "dev-06",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.5,
+          "wall_ms": 4.5
+        },
+        {
+          "id": "dev-07",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 16.3,
+          "wall_ms": 16.3
+        },
+        {
+          "id": "dev-08",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 5.9,
+          "wall_ms": 5.9
+        },
+        {
+          "id": "dev-09",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.8571428571428571,
+            "precision": 1.0,
+            "recall": 0.75,
+            "f1": 0.8571428571428571
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 5.0,
+          "wall_ms": 5.0
+        },
+        {
+          "id": "dev-10",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.3,
+          "wall_ms": 4.3
+        },
+        {
+          "id": "dev-11",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 17.9,
+          "wall_ms": 17.9
+        },
+        {
+          "id": "dev-12",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 16,
+          "tool_latency_ms": 95.1,
+          "wall_ms": 95.2
+        },
+        {
+          "id": "dev-13",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 12.4,
+          "wall_ms": 12.4
+        },
+        {
+          "id": "dev-14",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 5.4,
+          "wall_ms": 5.4
+        },
+        {
+          "id": "dev-15",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 14.5,
+          "wall_ms": 14.6
+        },
+        {
+          "id": "dev-16",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 32.8,
+          "wall_ms": 32.8
+        },
+        {
+          "id": "dev-17",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 1.0,
+            "p_at_k": 1.0,
+            "mrr": 1.0,
+            "k": 3
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 15.5,
+          "wall_ms": 15.5
+        },
+        {
+          "id": "dev-18",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 1.0,
+            "p_at_k": 1.0,
+            "mrr": 1.0,
+            "k": 5
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 14.9,
+          "wall_ms": 14.9
+        },
+        {
+          "id": "dev-19",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "depth_match": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 13.6,
+          "wall_ms": 13.6
+        },
+        {
+          "id": "dev-20",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 41.3,
+          "wall_ms": 41.3
+        },
+        {
+          "id": "dev-21",
+          "group": "4-6-hop",
+          "kind": "path",
+          "score": {
+            "primary": 1.0,
+            "start_ok": true,
+            "end_ok": true,
+            "depth_ok": true,
+            "path_cited": true,
+            "path_valid": true
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 7.8,
+          "wall_ms": 7.8
+        },
+        {
+          "id": "dev-22",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 658.9,
+          "wall_ms": 658.9
+        },
+        {
+          "id": "dev-23",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-24",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-25",
+          "group": "counterfactual",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 32.4,
+          "wall_ms": 32.4
+        },
+        {
+          "id": "dev-26",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 231.4,
+          "wall_ms": 234.3
+        },
+        {
+          "id": "dev-27",
+          "group": "counterfactual",
+          "kind": "ranked",
+          "score": {
+            "primary": 1.0,
+            "p_at_k": 1.0,
+            "mrr": 1.0,
+            "k": 1
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        }
+      ],
+      "aggregate": {
+        "n": 27,
+        "overall": 0.995,
+        "1-hop": 1.0,
+        "2-3-hop": 0.982,
+        "4-6-hop": 1.0,
+        "counterfactual": 1.0,
+        "scalar": {
+          "n": 13,
+          "primary": 1.0,
+          "correct": 1.0
+        },
+        "set": {
+          "n": 10,
+          "primary": 0.986,
+          "precision": 1.0,
+          "recall": 0.975,
+          "f1": 0.986
+        },
+        "ranked": {
+          "n": 3,
+          "primary": 1.0,
+          "p_at_k": 1.0,
+          "mrr": 1.0
+        },
+        "path": {
+          "n": 1,
+          "primary": 1.0,
+          "start_ok": 1.0,
+          "end_ok": 1.0,
+          "depth_ok": 1.0,
+          "path_cited": 1.0,
+          "path_valid": 1.0
+        },
+        "avg_calls": 1.8,
+        "avg_wall_ms": 46.9,
+        "errors": 0
+      },
+      "total_calls": 48,
+      "total_tool_latency_ms": 1262.2,
+      "used_llm": false
+    },
+    {
+      "system": "flat-lexical-tables",
+      "rows": [
+        {
+          "id": "dev-01",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-02",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-03",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-04",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-05",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-06",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-07",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-08",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-09",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.888888888888889,
+            "precision": 0.8,
+            "recall": 1.0,
+            "f1": 0.888888888888889
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-10",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-11",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-12",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-13",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 4,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-14",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-15",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-16",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-17",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.0,
+            "p_at_k": 0.0,
+            "mrr": 0.0,
+            "k": 3
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.1
+        },
+        {
+          "id": "dev-18",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.0,
+            "p_at_k": 0.0,
+            "mrr": 0.0,
+            "k": 5
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-19",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "depth_match": false
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-20",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 6,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-21",
+          "group": "4-6-hop",
+          "kind": "path",
+          "score": {
+            "primary": 0.0,
+            "start_ok": false,
+            "end_ok": false,
+            "depth_ok": false,
+            "path_cited": false,
+            "path_valid": false
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-22",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 6,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-23",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 9,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.1
+        },
+        {
+          "id": "dev-24",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-25",
+          "group": "counterfactual",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 4,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-26",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "dev-27",
+          "group": "counterfactual",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.25,
+            "p_at_k": 0.0,
+            "mrr": 0.5,
+            "k": 1
+          },
+          "error": null,
+          "calls": 9,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.1
+        }
+      ],
+      "aggregate": {
+        "n": 27,
+        "overall": 0.227,
+        "1-hop": 0.667,
+        "2-3-hop": 0.236,
+        "4-6-hop": 0.0,
+        "counterfactual": 0.042,
+        "scalar": {
+          "n": 13,
+          "primary": 0.385,
+          "correct": 0.385
+        },
+        "set": {
+          "n": 10,
+          "primary": 0.089,
+          "precision": 0.08,
+          "recall": 0.1,
+          "f1": 0.089
+        },
+        "ranked": {
+          "n": 3,
+          "primary": 0.083,
+          "p_at_k": 0.0,
+          "mrr": 0.167
+        },
+        "path": {
+          "n": 1,
+          "primary": 0.0,
+          "start_ok": 0.0,
+          "end_ok": 0.0,
+          "depth_ok": 0.0,
+          "path_cited": 0.0,
+          "path_valid": 0.0
+        },
+        "avg_calls": 2.8,
+        "avg_wall_ms": 0.0,
+        "errors": 0
+      },
+      "total_calls": 76,
+      "total_tool_latency_ms": 0.5,
+      "used_llm": false
+    },
+    {
+      "system": "unbounded-cypher-proxy",
+      "rows": [
+        {
+          "id": "dev-01",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.4,
+          "wall_ms": 3.4
+        },
+        {
+          "id": "dev-02",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 2.9,
+          "wall_ms": 2.9
+        },
+        {
+          "id": "dev-03",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 20.1,
+          "wall_ms": 20.1
+        },
+        {
+          "id": "dev-04",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 20.7,
+          "wall_ms": 20.7
+        },
+        {
+          "id": "dev-05",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 21.2,
+          "wall_ms": 21.2
+        },
+        {
+          "id": "dev-06",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.5,
+          "wall_ms": 4.5
+        },
+        {
+          "id": "dev-07",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.6956521739130436,
+            "precision": 0.5333333333333333,
+            "recall": 1.0,
+            "f1": 0.6956521739130436
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 19.6,
+          "wall_ms": 19.6
+        },
+        {
+          "id": "dev-08",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.6,
+          "wall_ms": 3.6
+        },
+        {
+          "id": "dev-09",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 2.8,
+          "wall_ms": 2.8
+        },
+        {
+          "id": "dev-10",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.2,
+          "wall_ms": 3.2
+        },
+        {
+          "id": "dev-11",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 2.9,
+          "wall_ms": 2.9
+        },
+        {
+          "id": "dev-12",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 5.1,
+          "wall_ms": 5.1
+        },
+        {
+          "id": "dev-13",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.5,
+          "wall_ms": 3.6
+        },
+        {
+          "id": "dev-14",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.3,
+          "wall_ms": 3.3
+        },
+        {
+          "id": "dev-15",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 19.5,
+          "wall_ms": 19.5
+        },
+        {
+          "id": "dev-16",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 5.5,
+          "wall_ms": 5.5
+        },
+        {
+          "id": "dev-17",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.6666666666666666,
+            "p_at_k": 0.3333333333333333,
+            "mrr": 1.0,
+            "k": 3
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 9.5,
+          "wall_ms": 9.5
+        },
+        {
+          "id": "dev-18",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.8,
+            "p_at_k": 0.6,
+            "mrr": 1.0,
+            "k": 5
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 14.6,
+          "wall_ms": 14.6
+        },
+        {
+          "id": "dev-19",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.33333333333333337,
+            "precision": 0.2,
+            "recall": 1.0,
+            "f1": 0.33333333333333337,
+            "depth_match": false
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 23.0,
+          "wall_ms": 23.0
+        },
+        {
+          "id": "dev-20",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 4,
+          "tool_latency_ms": 68.6,
+          "wall_ms": 68.7
+        },
+        {
+          "id": "dev-21",
+          "group": "4-6-hop",
+          "kind": "path",
+          "score": {
+            "primary": 0.0,
+            "start_ok": false,
+            "end_ok": false,
+            "depth_ok": false,
+            "path_cited": false,
+            "path_valid": false
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.9,
+          "wall_ms": 5.0
+        },
+        {
+          "id": "dev-22",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 2.9,
+          "wall_ms": 2.9
+        },
+        {
+          "id": "dev-23",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.4,
+          "wall_ms": 4.4
+        },
+        {
+          "id": "dev-24",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 2.8,
+          "wall_ms": 2.8
+        },
+        {
+          "id": "dev-25",
+          "group": "counterfactual",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 18.7,
+          "wall_ms": 18.7
+        },
+        {
+          "id": "dev-26",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.6,
+          "wall_ms": 4.6
+        },
+        {
+          "id": "dev-27",
+          "group": "counterfactual",
+          "kind": "ranked",
+          "score": {
+            "primary": 1.0,
+            "p_at_k": 1.0,
+            "mrr": 1.0,
+            "k": 1
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.2,
+          "wall_ms": 4.2
+        }
+      ],
+      "aggregate": {
+        "n": 27,
+        "overall": 0.685,
+        "1-hop": 1.0,
+        "2-3-hop": 0.712,
+        "4-6-hop": 0.543,
+        "counterfactual": 0.5,
+        "scalar": {
+          "n": 13,
+          "primary": 0.769,
+          "correct": 0.769
+        },
+        "set": {
+          "n": 10,
+          "primary": 0.603,
+          "precision": 0.573,
+          "recall": 0.7,
+          "f1": 0.603
+        },
+        "ranked": {
+          "n": 3,
+          "primary": 0.822,
+          "p_at_k": 0.644,
+          "mrr": 1.0
+        },
+        "path": {
+          "n": 1,
+          "primary": 0.0,
+          "start_ok": 0.0,
+          "end_ok": 0.0,
+          "depth_ok": 0.0,
+          "path_cited": 0.0,
+          "path_valid": 0.0
+        },
+        "avg_calls": 1.1,
+        "avg_wall_ms": 11.1,
+        "errors": 0
+      },
+      "total_calls": 30,
+      "total_tool_latency_ms": 299.8,
+      "used_llm": false
+    }
+  ]
+}

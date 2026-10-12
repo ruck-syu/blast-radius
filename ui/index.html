@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blast Radius — supply-chain triage</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <h1>Blast Radius</h1>
+  <p class="sub">supply-chain triage over FalkorDB · Track 01</p>
+  <div class="controls">
+    <select id="org">
+      <option value="dev">dev org</option>
+      <option value="heldout">held-out org</option>
+    </select>
+    <input id="cve" value="CVE-2021-44228" spellcheck="false" placeholder="CVE-XXXX-XXXXX">
+    <button id="triageBtn">Triage</button>
+    <span id="status"></span>
+  </div>
+</header>
+<main>
+  <section id="summary" class="card hidden"></section>
+  <div class="cols">
+    <section class="card">
+      <h2>Ranked services</h2>
+      <div id="ranked"><p class="hint">Run triage to populate.</p></div>
+    </section>
+    <section class="card">
+      <h2>Detail + proof path</h2>
+      <div id="detail"><p class="hint">Select a service.</p></div>
+    </section>
+  </div>
+  <div class="cols">
+    <section class="card">
+      <h2>Fix simulation</h2>
+      <button id="simBtn" disabled>Simulate fixes</button>
+      <div id="sim"></div>
+    </section>
+    <section class="card">
+      <h2>Actions</h2>
+      <div class="controls">
+        <button id="actBtn" disabled>Ticket + notify ACT_NOW</button>
+        <button id="drillBtn" disabled>Guardrail drill (forged proof)</button>
+      </div>
+      <div id="acted"></div>
+      <div id="refusal"></div>
+    </section>
+  </div>
+  <section class="card">
+    <h2>Action log <button id="logBtn" class="small">refresh</button></h2>
+    <div id="alog"><p class="hint">No entries yet.</p></div>
+  </section>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

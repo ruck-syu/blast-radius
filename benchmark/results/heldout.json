@@ -1,0 +1,1292 @@
+{
+  "org": "heldout",
+  "n_questions": 27,
+  "writer": "proxy",
+  "ablated": false,
+  "systems": [
+    {
+      "system": "agent-parameterized-tools",
+      "rows": [
+        {
+          "id": "heldout-01",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.7,
+          "wall_ms": 4.7
+        },
+        {
+          "id": "heldout-02",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 6.7,
+          "wall_ms": 6.7
+        },
+        {
+          "id": "heldout-03",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 5.5,
+          "wall_ms": 5.5
+        },
+        {
+          "id": "heldout-04",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.2,
+          "wall_ms": 3.3
+        },
+        {
+          "id": "heldout-05",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 16.3,
+          "wall_ms": 16.3
+        },
+        {
+          "id": "heldout-06",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.3,
+          "wall_ms": 4.3
+        },
+        {
+          "id": "heldout-07",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 16.8,
+          "wall_ms": 16.8
+        },
+        {
+          "id": "heldout-08",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 7.6,
+          "wall_ms": 7.6
+        },
+        {
+          "id": "heldout-09",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.9473684210526316,
+            "precision": 1.0,
+            "recall": 0.9,
+            "f1": 0.9473684210526316
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 8.3,
+          "wall_ms": 8.3
+        },
+        {
+          "id": "heldout-10",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 5.1,
+          "wall_ms": 5.1
+        },
+        {
+          "id": "heldout-11",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 18.0,
+          "wall_ms": 18.0
+        },
+        {
+          "id": "heldout-12",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 16,
+          "tool_latency_ms": 130.8,
+          "wall_ms": 131.0
+        },
+        {
+          "id": "heldout-13",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 11.0,
+          "wall_ms": 11.0
+        },
+        {
+          "id": "heldout-14",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 5.1,
+          "wall_ms": 5.1
+        },
+        {
+          "id": "heldout-15",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 13.9,
+          "wall_ms": 13.9
+        },
+        {
+          "id": "heldout-16",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 15.0,
+          "wall_ms": 15.0
+        },
+        {
+          "id": "heldout-17",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 1.0,
+            "p_at_k": 1.0,
+            "mrr": 1.0,
+            "k": 3
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 14.0,
+          "wall_ms": 14.0
+        },
+        {
+          "id": "heldout-18",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 1.0,
+            "p_at_k": 1.0,
+            "mrr": 1.0,
+            "k": 5
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 14.7,
+          "wall_ms": 14.7
+        },
+        {
+          "id": "heldout-19",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "depth_match": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 12.6,
+          "wall_ms": 12.6
+        },
+        {
+          "id": "heldout-20",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 46.5,
+          "wall_ms": 46.6
+        },
+        {
+          "id": "heldout-21",
+          "group": "4-6-hop",
+          "kind": "path",
+          "score": {
+            "primary": 1.0,
+            "start_ok": true,
+            "end_ok": true,
+            "depth_ok": true,
+            "path_cited": true,
+            "path_valid": true
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 6.6,
+          "wall_ms": 6.6
+        },
+        {
+          "id": "heldout-22",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 698.1,
+          "wall_ms": 698.1
+        },
+        {
+          "id": "heldout-23",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-24",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-25",
+          "group": "counterfactual",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 39.8,
+          "wall_ms": 39.8
+        },
+        {
+          "id": "heldout-26",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 244.0,
+          "wall_ms": 247.2
+        },
+        {
+          "id": "heldout-27",
+          "group": "counterfactual",
+          "kind": "ranked",
+          "score": {
+            "primary": 1.0,
+            "p_at_k": 1.0,
+            "mrr": 1.0,
+            "k": 1
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        }
+      ],
+      "aggregate": {
+        "n": 27,
+        "overall": 0.998,
+        "1-hop": 1.0,
+        "2-3-hop": 0.993,
+        "4-6-hop": 1.0,
+        "counterfactual": 1.0,
+        "scalar": {
+          "n": 13,
+          "primary": 1.0,
+          "correct": 1.0
+        },
+        "set": {
+          "n": 10,
+          "primary": 0.995,
+          "precision": 1.0,
+          "recall": 0.99,
+          "f1": 0.995
+        },
+        "ranked": {
+          "n": 3,
+          "primary": 1.0,
+          "p_at_k": 1.0,
+          "mrr": 1.0
+        },
+        "path": {
+          "n": 1,
+          "primary": 1.0,
+          "start_ok": 1.0,
+          "end_ok": 1.0,
+          "depth_ok": 1.0,
+          "path_cited": 1.0,
+          "path_valid": 1.0
+        },
+        "avg_calls": 1.8,
+        "avg_wall_ms": 50.1,
+        "errors": 0
+      },
+      "total_calls": 48,
+      "total_tool_latency_ms": 1348.4,
+      "used_llm": false
+    },
+    {
+      "system": "flat-lexical-tables",
+      "rows": [
+        {
+          "id": "heldout-01",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-02",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-03",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-04",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-05",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-06",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-07",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-08",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-09",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.9090909090909091,
+            "precision": 0.8333333333333334,
+            "recall": 1.0,
+            "f1": 0.9090909090909091
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-10",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-11",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-12",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-13",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 4,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-14",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-15",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-16",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-17",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.0,
+            "p_at_k": 0.0,
+            "mrr": 0.0,
+            "k": 3
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.1
+        },
+        {
+          "id": "heldout-18",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.0,
+            "p_at_k": 0.0,
+            "mrr": 0.0,
+            "k": 5
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-19",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "depth_match": false
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-20",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 6,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-21",
+          "group": "4-6-hop",
+          "kind": "path",
+          "score": {
+            "primary": 0.0,
+            "start_ok": false,
+            "end_ok": false,
+            "depth_ok": false,
+            "path_cited": false,
+            "path_valid": false
+          },
+          "error": null,
+          "calls": 0,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-22",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 6,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-23",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 9,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.1
+        },
+        {
+          "id": "heldout-24",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 3,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-25",
+          "group": "counterfactual",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 4,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-26",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 2,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        },
+        {
+          "id": "heldout-27",
+          "group": "counterfactual",
+          "kind": "ranked",
+          "score": {
+            "primary": 1.0,
+            "p_at_k": 1.0,
+            "mrr": 1.0,
+            "k": 1
+          },
+          "error": null,
+          "calls": 9,
+          "tool_latency_ms": 0.0,
+          "wall_ms": 0.0
+        }
+      ],
+      "aggregate": {
+        "n": 27,
+        "overall": 0.293,
+        "1-hop": 0.667,
+        "2-3-hop": 0.239,
+        "4-6-hop": 0.0,
+        "counterfactual": 0.333,
+        "scalar": {
+          "n": 13,
+          "primary": 0.462,
+          "correct": 0.462
+        },
+        "set": {
+          "n": 10,
+          "primary": 0.091,
+          "precision": 0.083,
+          "recall": 0.1,
+          "f1": 0.091
+        },
+        "ranked": {
+          "n": 3,
+          "primary": 0.333,
+          "p_at_k": 0.333,
+          "mrr": 0.333
+        },
+        "path": {
+          "n": 1,
+          "primary": 0.0,
+          "start_ok": 0.0,
+          "end_ok": 0.0,
+          "depth_ok": 0.0,
+          "path_cited": 0.0,
+          "path_valid": 0.0
+        },
+        "avg_calls": 2.8,
+        "avg_wall_ms": 0.0,
+        "errors": 0
+      },
+      "total_calls": 76,
+      "total_tool_latency_ms": 0.5,
+      "used_llm": false
+    },
+    {
+      "system": "unbounded-cypher-proxy",
+      "rows": [
+        {
+          "id": "heldout-01",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.5,
+          "wall_ms": 3.5
+        },
+        {
+          "id": "heldout-02",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 2.8,
+          "wall_ms": 2.8
+        },
+        {
+          "id": "heldout-03",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 18.8,
+          "wall_ms": 18.8
+        },
+        {
+          "id": "heldout-04",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 17.9,
+          "wall_ms": 17.9
+        },
+        {
+          "id": "heldout-05",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 17.6,
+          "wall_ms": 17.6
+        },
+        {
+          "id": "heldout-06",
+          "group": "1-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 2.7,
+          "wall_ms": 2.7
+        },
+        {
+          "id": "heldout-07",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.846153846153846,
+            "precision": 0.7333333333333333,
+            "recall": 1.0,
+            "f1": 0.846153846153846
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 17.5,
+          "wall_ms": 17.5
+        },
+        {
+          "id": "heldout-08",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.4,
+          "wall_ms": 3.5
+        },
+        {
+          "id": "heldout-09",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.0,
+          "wall_ms": 3.0
+        },
+        {
+          "id": "heldout-10",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.8,
+          "wall_ms": 3.9
+        },
+        {
+          "id": "heldout-11",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 2.9,
+          "wall_ms": 2.9
+        },
+        {
+          "id": "heldout-12",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.0,
+          "wall_ms": 4.0
+        },
+        {
+          "id": "heldout-13",
+          "group": "2-3-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.4,
+          "wall_ms": 3.4
+        },
+        {
+          "id": "heldout-14",
+          "group": "2-3-hop",
+          "kind": "scalar",
+          "score": {
+            "primary": 1.0,
+            "correct": true
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.5,
+          "wall_ms": 3.5
+        },
+        {
+          "id": "heldout-15",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 18.2,
+          "wall_ms": 18.2
+        },
+        {
+          "id": "heldout-16",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.5,
+          "wall_ms": 3.5
+        },
+        {
+          "id": "heldout-17",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.8333333333333333,
+            "p_at_k": 0.6666666666666666,
+            "mrr": 1.0,
+            "k": 3
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 12.4,
+          "wall_ms": 12.4
+        },
+        {
+          "id": "heldout-18",
+          "group": "4-6-hop",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.8,
+            "p_at_k": 0.6,
+            "mrr": 1.0,
+            "k": 5
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 14.7,
+          "wall_ms": 14.7
+        },
+        {
+          "id": "heldout-19",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 0.4210526315789474,
+            "precision": 0.26666666666666666,
+            "recall": 1.0,
+            "f1": 0.4210526315789474,
+            "depth_match": false
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 20.7,
+          "wall_ms": 20.7
+        },
+        {
+          "id": "heldout-20",
+          "group": "4-6-hop",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 4,
+          "tool_latency_ms": 81.5,
+          "wall_ms": 81.6
+        },
+        {
+          "id": "heldout-21",
+          "group": "4-6-hop",
+          "kind": "path",
+          "score": {
+            "primary": 0.0,
+            "start_ok": false,
+            "end_ok": false,
+            "depth_ok": false,
+            "path_cited": false,
+            "path_valid": false
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.3,
+          "wall_ms": 4.3
+        },
+        {
+          "id": "heldout-22",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.3,
+          "wall_ms": 3.3
+        },
+        {
+          "id": "heldout-23",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.0,
+          "wall_ms": 4.0
+        },
+        {
+          "id": "heldout-24",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.2,
+          "wall_ms": 4.2
+        },
+        {
+          "id": "heldout-25",
+          "group": "counterfactual",
+          "kind": "set",
+          "score": {
+            "primary": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 20.4,
+          "wall_ms": 20.4
+        },
+        {
+          "id": "heldout-26",
+          "group": "counterfactual",
+          "kind": "scalar",
+          "score": {
+            "primary": 0.0,
+            "correct": false
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 3.9,
+          "wall_ms": 3.9
+        },
+        {
+          "id": "heldout-27",
+          "group": "counterfactual",
+          "kind": "ranked",
+          "score": {
+            "primary": 0.16666666666666666,
+            "p_at_k": 0.0,
+            "mrr": 0.3333333333333333,
+            "k": 1
+          },
+          "error": null,
+          "calls": 1,
+          "tool_latency_ms": 4.1,
+          "wall_ms": 4.1
+        }
+      ],
+      "aggregate": {
+        "n": 27,
+        "overall": 0.632,
+        "1-hop": 1.0,
+        "2-3-hop": 0.731,
+        "4-6-hop": 0.579,
+        "counterfactual": 0.194,
+        "scalar": {
+          "n": 13,
+          "primary": 0.692,
+          "correct": 0.692
+        },
+        "set": {
+          "n": 10,
+          "primary": 0.627,
+          "precision": 0.6,
+          "recall": 0.7,
+          "f1": 0.627
+        },
+        "ranked": {
+          "n": 3,
+          "primary": 0.6,
+          "p_at_k": 0.422,
+          "mrr": 0.778
+        },
+        "path": {
+          "n": 1,
+          "primary": 0.0,
+          "start_ok": 0.0,
+          "end_ok": 0.0,
+          "depth_ok": 0.0,
+          "path_cited": 0.0,
+          "path_valid": 0.0
+        },
+        "avg_calls": 1.1,
+        "avg_wall_ms": 11.1,
+        "errors": 0
+      },
+      "total_calls": 30,
+      "total_tool_latency_ms": 300.1,
+      "used_llm": false
+    }
+  ]
+}

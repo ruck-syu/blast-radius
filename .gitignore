@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+.fresh-venv/
+ingest/seed_*.json
+benchmark/counts.json
+actions/log.jsonl

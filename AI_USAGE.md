@@ -11,3 +11,4 @@ Disclosure of AI assistant usage (per competition rules).
 | 2026-10-12 | OpenCode (Muse Spark) | Phase 5: proof-path guardrail + Decision nodes, 3 action tools (env-gated delivery), agent act flow, test_actions.py acceptance |
 | 2026-10-12 | OpenCode (Muse Spark) | Phase 6: stdlib UI server + single-page console (ranked list, SVG paths, sim view, action log, refusal drill), HTTP + render-harness verification |
 | 2026-10-12 | OpenCode (Muse Spark) | Phase 7: question bank (27/org), 3 benchmark systems, runner + metrics + ablation, results table + methodology |
+| 2026-10-12 | OpenCode (Muse Spark) | Phase 8: apply_change tool, full README per spec s9, demo script, fresh-machine rebuild validation, repo commit |

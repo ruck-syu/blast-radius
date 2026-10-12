@@ -23,4 +23,7 @@ Non-obvious choices (choice, reason, rejected alternatives).
 - Benchmark baselines are documented no-LLM stand-ins (lexical SQLite; unbounded-Cypher templates) with a real LLM-writer hook for keyed runs. Rejected: fabricating LLM baseline numbers or skipping the 3-system comparison.
 - Ranked benchmark relevance = reachability, not risk-score order, so the metric can't be gamed by reproducing our own scores. Rejected: ranking-against-own-output.
 - No benchmark-driven tuning: post-run fixes were correctness bugs (or baseline improvements), thresholds untouched. Rejected: tuning rules/prompts on dev scores.
+- `apply_change` upserts require referenced nodes to exist (validated, else error) instead of MERGE-creating unknowns. Rejected: silent invention of packages/services.
+- Seeds/seed-regenerable artifacts gitignored; ground truth + questions + results committed as evaluation evidence. Fresh rebuild reproduces all numbers exactly. Rejected: committing 7 MB of regenerable seeds.
+- Demo video left to the human (needs screen recording); `docs/demo-script.md` makes it mechanical. Rejected: claiming the video deliverable done.
 - UI backend reuses agent/MCP functions directly; the refusal drill tampers a real proof and submits it through the real guardrail. Rejected: mock refusal message (would not prove the guardrail).

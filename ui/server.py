@@ -22,6 +22,7 @@ Routes:
   GET  /api/live?org=           live changes currently applied (agent.live)
   POST /api/live                {op: expose|adopt, service, cve?, org?} mutate the live graph
   POST /api/live_revert         {org?} remove every live change
+  POST /api/assess              {service, adds?, expose?, org?} pre-merge check in a sandbox copy
 """
 from __future__ import annotations
 
@@ -43,6 +44,7 @@ from mcp_server import graph
 from mcp_server.server import create_ticket
 from mcp_server.actions import action_log_path
 from mcp_server.server import get_cve
+from mcp_server.assess import assess_change
 from mcp_server.simulate import list_cves
 from ingest.config import graph_name
 
@@ -165,6 +167,10 @@ class Handler(BaseHTTPRequestHandler):
                 if op == "adopt":
                     return _json(self, live.adopt(body["service"], body["cve"], org))
                 raise ValueError(f"unknown live op {op!r} (expose|adopt)")
+            if url.path == "/api/assess":
+                return _json(self, assess_change(body["service"], body.get("adds") or [],
+                                                 body.get("expose") or "",
+                                                 body.get("org", "dev")))
             if url.path == "/api/live_revert":
                 return _json(self, live.revert(body.get("org", "dev")))
             return _json(self, {"error": f"unknown route {url.path}"}, 404)

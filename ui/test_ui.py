@@ -105,6 +105,10 @@ def main() -> None:
                       if not r["reachable"] and r["tier"] == "critical")
         clean = next(s["name"] for s in get("/api/services?org=dev")["services"]
                      if s["name"] not in by)
+        pred = post("/api/assess", {"service": hidden, "expose": "/live/x", "org": "dev"})
+        check("sandbox predicts the flip without touching live",
+              any(f["service"] == hidden and f["after"] == "ACT_NOW" for f in pred["findings"])
+              and not get("/api/live?org=dev")["changes"])
         try:
             post("/api/live", {"op": "expose", "service": hidden, "org": "dev"})
             post("/api/live", {"op": "adopt", "service": clean, "cve": CVE, "org": "dev"})

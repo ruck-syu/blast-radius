@@ -45,13 +45,14 @@
   </div>
 
   <section class="card" id="liveCard">
-    <h2>Live change <span class="kv">mutate the live graph, re-triage instantly: no retraining, no reload</span></h2>
+    <h2>Live change <span class="kv">predict it in a sandbox copy (the pre-merge gate), or apply it to the live graph and re-triage: no retraining, no reload</span></h2>
     <div class="controls">
       <select id="liveOp" aria-label="change">
         <option value="expose">Expose to the internet (new public endpoint)</option>
         <option value="adopt">Adopt the vulnerable package (new dependency)</option>
       </select>
       <select id="liveSvc" aria-label="service"></select>
+      <button id="assessBtn" class="alt" disabled>Check in sandbox</button>
       <button id="liveBtn" disabled>Apply to live graph</button>
       <button id="revertBtn" class="ghost" disabled>Revert live changes</button>
     </div>

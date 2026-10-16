@@ -15,6 +15,7 @@ input,select,button { background:var(--card); color:var(--fg); border:1px solid 
 input#cve { width:170px; font-family:ui-monospace,monospace; }
 input.grow { flex:1; min-width:280px; }
 button { cursor:pointer; background:#1f6feb; border-color:#1f6feb; }
+button.alt { background:transparent; border-color:var(--acc); color:var(--acc); }
 button.ghost { background:transparent; border-color:var(--act); color:var(--act); }
 button:disabled { opacity:.4; cursor:default; }
 button.small { padding:2px 8px; font-size:12px; }

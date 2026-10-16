@@ -21,7 +21,7 @@ import json
 import logging
 import time
 
-from mcp_server import graph
+from mcp_server.server import get_cve as server_get_cve
 from mcp_server.server import (
     find_affected_services, check_reachability, dependency_path,
     rank_criticality, find_owner, score_risk, evaluate_rules,
@@ -64,13 +64,10 @@ def verify_proof(path: dict | None, service: str, vuln_purl: str) -> tuple[bool,
 
 
 def get_cve(cve: str, org: str) -> dict | None:
-    rows, latency_ms = graph.run(org, "get_cve", {"cve": cve})
-    if not rows:
+    meta = server_get_cve(cve, org)
+    if not meta["found"]:
         return None
-    r = rows[0]
-    return {"id": r[0], "cvss": r[1], "epss": r[2], "in_kev": bool(r[3]),
-            "summary": r[4], "vuln_purl": r[5], "fixed_purl": r[6],
-            "latency_ms": latency_ms}
+    return {k: v for k, v in meta.items() if k not in ("org", "found")}
 
 
 def triage(cve_id: str, org: str = "dev", use_llm: bool = True) -> dict:

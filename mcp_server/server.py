@@ -1,6 +1,6 @@
 """Blast Radius MCP server: graph tools for the triage agent.
 
-Tools: find_affected_services, check_reachability, dependency_path,
+Tools: get_cve, find_affected_services, check_reachability, dependency_path,
        rank_criticality, find_owner, score_risk, evaluate_rules, simulate_fix,
        apply_change, create_ticket, notify_owner, open_fix_pr (actions require proof_path).
 Every tool runs parameterized Cypher from queries/*.cypher against FalkorDB,
@@ -29,6 +29,18 @@ def _limit(value: int, default: int, maximum: int = 100) -> int:
     if not isinstance(value, int) or isinstance(value, bool) or not 1 <= value <= maximum:
         raise ValueError(f"limit must be an int 1..{maximum}, got {value!r}")
     return value
+
+
+@mcp.tool()
+def get_cve(cve: str, org: str = "dev") -> dict:
+    """CVE metadata: cvss, epss, KEV status, summary, vulnerable purl, fixed purl (found=False if unknown)."""
+    rows, latency_ms = graph.run(org, "get_cve", {"cve": cve})
+    if not rows:
+        return {"cve": cve, "org": org, "found": False, "latency_ms": latency_ms}
+    r = rows[0]
+    return {"id": r[0], "org": org, "found": True, "cvss": r[1], "epss": r[2],
+            "in_kev": bool(r[3]), "summary": r[4], "vuln_purl": r[5],
+            "fixed_purl": r[6], "latency_ms": latency_ms}
 
 
 @mcp.tool()
@@ -61,10 +73,14 @@ def dependency_path(cve: str, service: str, org: str = "dev") -> dict:
 
 @mcp.tool()
 def rank_criticality(org: str = "dev", limit: int = 20) -> dict:
-    """Centrality ranking over the service CALLS graph, with call edges as evidence."""
+    """Rank services by PageRank + betweenness over the CALLS graph (FalkorDB algo.*).
+
+    High PageRank = many important services depend on it; high betweenness =
+    choke point on call paths. Returns call edges as evidence."""
     rows, lat1 = graph.run(org, "rank_criticality", {})
     edge_rows, lat2 = graph.run(org, "call_graph_edges", {})
-    ranking = [{"service": r[0], "out_degree": r[1], "in_degree": r[2]} for r in rows]
+    ranking = [{"service": r[0], "out_degree": r[1], "in_degree": r[2],
+                "pagerank": round(r[3], 4), "betweenness": r[4]} for r in rows]
     # NOTE: ranking order is produced by the Cypher ORDER BY; limit slices only.
     ranking = ranking[:_limit(limit, 20)]
     return {"org": org, "ranking": ranking,

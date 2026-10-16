@@ -43,8 +43,9 @@ def _anthropic(prompt: str, timeout_s: int) -> str:
 
     client = anthropic.Anthropic(timeout=timeout_s)
     msg = client.messages.create(
-        model=os.getenv("LLM_MODEL", "claude-sonnet-4-20250514"),
-        max_tokens=300,
+        model=os.getenv("LLM_MODEL", "claude-opus-5-5"),
+        max_tokens=4000,  # thinking is always on for Opus 5.5; leave room past it
+        output_config={"effort": "low"},  # short summary, not a hard reasoning task
         messages=[{"role": "user", "content": prompt}],
     )
     return "".join(b.text for b in msg.content if b.type == "text").strip()

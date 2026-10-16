@@ -71,6 +71,7 @@ python -m agent.mcp_agent --question "Is d-checkout-api exposed to CVE-2021-4422
 python -m agent.live expose d-notify-svc | adopt d-search-api --cve CVE-2021-44228 | list | revert
 python -m ingest.osv CVE-2021-45046 [--org heldout] [--dry-run]   # import a real advisory from OSV.dev
 python -m ingest.osv --scan --dry-run   # every OSV advisory for the graph's real packages
+python -m agent.posture [--org heldout] [--limit 10] [--json]   # every CVE rolled up: which upgrade clears the most
 python -m mcp_server.server   # MCP stdio transport for external clients
 ```
 
@@ -115,20 +116,25 @@ vulnerable package → CVE.
   route verified). Revert removes exactly those changes (provenance-tagged).
 - **Import from OSV.dev**: triage a CVE that isn't in the graph and the summary
   offers to import it (`ingest.osv`); it is triaged as soon as it lands.
+- **Org posture**: every CVE in the graph rolled up. Vulnerable packages ranked
+  by the ACT_NOW pairs an upgrade would clear, with the upgrade target in the
+  graph and whether that target is itself affected (e.g. struts 2.5.10.1 by a
+  KEV CVE once OSV advisories are imported); services ranked by ACT_NOW count,
+  each CVE clickable into triage.
 - **Fix simulation**, **Actions** (ticket + notify, guardrail drill with a
   forged proof), **Decisions** recorded in the graph, and the **Action log**.
 
 API (documented in the `ui/server.py` docstring): `GET /api/triage`,
 `/api/compare`, `/api/cves`, `/api/config`, `/api/decisions`,
-`/api/action_log`, `/api/services`, `/api/live`, `/api/investigate` (SSE);
+`/api/action_log`, `/api/services`, `/api/live`, `/api/posture`, `/api/investigate` (SSE);
 `POST /api/act`, `/api/refusal_drill`, `/api/live`, `/api/live_revert`,
 `/api/assess`, `/api/import_cve`.
 
 Tools (all parameterized Cypher from `queries/`, see below):
 `get_cve`, `find_affected_services`, `check_reachability`, `dependency_path`,
 `rank_criticality`, `find_owner`, `score_risk`, `evaluate_rules`,
-`simulate_fix`, `assess_change`, `apply_change`, `create_ticket`, `notify_owner`,
-`open_fix_pr`.
+`simulate_fix`, `assess_change`, `org_posture`, `apply_change`, `create_ticket`,
+`notify_owner`, `open_fix_pr`.
 
 Every action tool refuses without a proof path whose every edge exists in the
 graph. `open_fix_pr` adds a second check: the upgrade is applied to a sandbox
@@ -248,7 +254,7 @@ cites each affected service's rank), plus guardrail
 `list_live_changes`, `revert_live_*`), pre-merge checks (`package_exists`, `service_resolves`,
 `dependency_path_avoiding`, `service_sbom`), advisory import (`real_packages`,
 `packages_by_purl_prefix`, `cve_source`, `import_cve`, `import_fix_link`,
-`remove_imported_cve`, `prune_imported_upgrades`),
+`remove_imported_cve`, `prune_imported_upgrades`), posture (`cves_affecting`),
 and UI helpers (`get_cve`, `list_cves`, `list_services`, `list_decisions`,
 `call_graph_edges`).
 Depth bounds are literals injected after int validation — FalkorDB

@@ -1,8 +1,8 @@
-# Demo script (~6 min screen recording)
+# Demo script (~6.5 min screen recording)
 
 Prereqs: `docker compose up -d`, data loaded (see README Setup),
 `ANTHROPIC_API_KEY` in `.env` (for step 3), `python -m agent.reset_demo`
-(clean Decisions, live changes, log), then `python -m ui.server` on :8765.
+(clean Decisions, live changes, imported CVEs, log), then `python -m ui.server` on :8765.
 Use CVE-2021-44228, dev org.
 
 1. **Blast radius (0:00).** Triage loads on open. Narrate the tiles: 15
@@ -30,7 +30,13 @@ Use CVE-2021-44228, dev org.
 6. **Guardrail refusal (4:30).** Ticket + notify ACT_NOW, then the guardrail
    drill: a forged proof comes back refused with the missing edge named. "No
    path, no action."
-7. **Close (5:15).** Decisions recorded in the graph (ABOUT CVE/service,
+7. **A CVE published today (5:15).** Type CVE-2021-45046 (not in the seed
+   data), Triage: "not present". *Import from OSV.dev*: the real advisory's
+   range (>=2.13.0 <2.16.0) is matched against the graph's log4j versions,
+   CVSS 9.0 from the vector, CISA KEV yes, and it is triaged at once.
+   *Roll up all CVEs* (Org posture): log4j 2.14.1 tops the package list with
+   its upgrade target in the graph; click a service's CVE to jump into triage.
+8. **Close (5:45).** Decisions recorded in the graph (ABOUT CVE/service,
    FIRED rules) and the action log with accepts and the refusal.
 
 No key? In step 3 click *Offline planner (no model)* instead: the same MCP

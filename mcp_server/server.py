@@ -2,7 +2,7 @@
 
 Tools: get_cve, find_affected_services, check_reachability, dependency_path,
        rank_criticality, find_owner, score_risk, evaluate_rules, simulate_fix,
-       apply_change, create_ticket, notify_owner, open_fix_pr (actions require proof_path).
+       assess_change, org_posture, apply_change, create_ticket, notify_owner, open_fix_pr (actions require proof_path).
 Every tool runs parameterized Cypher from queries/*.cypher against FalkorDB,
 returns structured output including graph path(s), and reports query latency.
 
@@ -145,6 +145,16 @@ def assess_change(service: str, adds: list[str] | None = None, expose_path: str 
     chain) and every one the change resolves. Read-only."""
     from .assess import assess_change as _assess_change
     return _assess_change(service, adds, expose_path, org, removes)
+
+
+@mcp.tool()
+def org_posture(org: str = "dev", limit: int = 10) -> dict:
+    """Exposure across every CVE in the org: services ranked by ACT_NOW count then total
+    risk (with their CVEs), and vulnerable packages ranked by the ACT_NOW pairs whose
+    dependency chain ends at them, each with its upgrade target and any CVE that target
+    still carries. Use for "what should we fix first across everything?"."""
+    from .posture import org_posture as _org_posture
+    return _org_posture(org, _limit(limit, 10))
 
 
 @mcp.tool()

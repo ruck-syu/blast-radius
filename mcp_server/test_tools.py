@@ -11,7 +11,7 @@ from pathlib import Path
 
 from .server import (
     find_affected_services, check_reachability, dependency_path,
-    rank_criticality, find_owner, score_risk,
+    rank_criticality, find_owner, score_risk, org_posture,
 )
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -110,6 +110,20 @@ def main() -> None:
           and valid_chain(o["deploy_path"]))
     o = find_owner("no-such-service", org)
     check("owner missing -> found False", o["found"] is False)
+
+    # org_posture: the roll-up agrees with per-CVE triage
+    from agent.triage import triage
+    verdicts = [x["verdict"] for c in truth["cves"] for x in triage(c, org, use_llm=False)["results"]]
+    pz = org_posture(org, limit=100)
+    check("posture pairs = sum of per-CVE triage",
+          pz["cves"] == len(truth["cves"]) and pz["pairs"] == len(verdicts)
+          and pz["act_now_pairs"] == verdicts.count("ACT_NOW"),
+          f"{pz['pairs']} pairs, {pz['act_now_pairs']} ACT_NOW, {pz['latency_ms']}ms")
+    check("posture service counts add up", sum(sv["ACT_NOW"] + sv["SCHEDULE"] + sv["SUPPRESS"]
+                                               for sv in pz["services"]) == pz["pairs"])
+    log4j = next(p for p in pz["packages"] if p["purl"] == VULN_PURL["CVE-2021-44228"])
+    check("posture: log4j upgrade target in graph and clean",
+          log4j["upgrade_to"].endswith("@2.17.1") and log4j["target_affected_by"] == [])
 
     print("ALL PASS" if not fails else f"{len(fails)} FAILURES: {fails}")
     raise SystemExit(1 if fails else 0)

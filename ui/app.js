@@ -22,6 +22,7 @@ function shortLabel(n) {
   if (label0(n) === "Package") return `${p.name}@${p.version}`;
   return p.name || p.path || p.id || p.handle || "?";
 }
+const shortPurl = (purl) => String(purl || "").replace(/^pkg:[^/]+\//, "").replace(/^[^@]*\//, "");
 const COLORS = { Service:"#58a6ff", Package:"#d29922", CVE:"#f85149", Endpoint:"#3fb950" };
 const VCOLOR = { ACT_NOW:"#f85149", SCHEDULE:"#d29922", SUPPRESS:"#3fb950" };
 
@@ -420,6 +421,41 @@ async function refreshLog() {
   catch (e) { $("alog").innerHTML = `<p class="hint">log error: ${esc(e.message)}</p>`; }
 }
 
+/* ---------- org posture ---------- */
+async function loadPosture() {
+  const el = $("posture");
+  $("postureBtn").disabled = true;
+  el.innerHTML = `<p class="hint">scoring every (CVE, service) pair…</p>`;
+  try {
+    const r = await api(`/api/posture?org=${org()}&limit=8`);
+    const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+    const cveLink = (c) => `<a href="#" class="cvelink" data-cve="${esc(c)}">${esc(c)}</a>`;
+    const pkgRows = r.packages.map((p) => {
+      const t = p.target_affected_by, kev = t.filter((c) => c.in_kev).length;
+      const target = !p.upgrade_to ? `<span class="kv">no upgrade in graph</span>`
+        : `${esc(shortPurl(p.upgrade_to))} ` + (t.length
+          ? `<span class="pill ACT_NOW" title="${esc(t.map((c) => c.cve + (c.in_kev ? " (KEV)" : "")).join(", "))}">still affected by ${plural(t.length, "CVE")}${kev ? `, ${kev} KEV` : ""}</span>`
+          : `<span class="pill SUPPRESS">clean</span>`);
+      return `<tr><td>${esc(shortPurl(p.purl))}</td><td>${p.cves.length}</td><td>${p.act_now_pairs}</td>` +
+        `<td>${p.services}</td><td>${target}</td></tr>`;
+    }).join("");
+    const svcRows = r.services.map((s) => {
+      const act = s.cves.filter((c) => c.verdict === "ACT_NOW").map((c) => c.cve);
+      return `<tr><td>${esc(s.service)}</td><td>${s.ACT_NOW}</td><td>${s.SCHEDULE}</td><td>${s.risk}</td>` +
+        `<td>${act.slice(0, 5).map(cveLink).join(" ")}${act.length > 5 ? ` +${act.length - 5}` : ""}</td></tr>`;
+    }).join("");
+    el.innerHTML =
+      `<p class="kv">${plural(r.cves, "CVE")} · ${r.pairs} (CVE, service) pairs · <b>${r.act_now_pairs} ACT_NOW</b> · ` +
+      `${r.services_affected} services affected · ${r.latency_ms.toFixed(0)} ms</p>` +
+      `<table class="ftable"><tr><th>vulnerable package</th><th>CVEs</th><th>ACT_NOW pairs</th><th>services</th><th>upgrade in graph</th></tr>${pkgRows}</table>` +
+      `<table class="ftable"><tr><th>service</th><th>ACT_NOW</th><th>SCHEDULE</th><th>risk</th><th>ACT_NOW CVEs</th></tr>${svcRows}</table>`;
+    el.querySelectorAll(".cvelink").forEach((a) => a.addEventListener("click", (e) => {
+      e.preventDefault(); $("cve").value = a.dataset.cve; runTriage(); window.scrollTo({ top: 0, behavior: "smooth" });
+    }));
+  } catch (e) { el.innerHTML = `<p class="hint">posture error: ${esc(e.message)}</p>`; }
+  $("postureBtn").disabled = false;
+}
+
 /* ---------- wiring ---------- */
 async function loadCves() {
   try {
@@ -452,8 +488,9 @@ async function loadServices() {
 
 $("triageBtn").addEventListener("click", () => runTriage());
 $("cve").addEventListener("keydown", (e) => { if (e.key === "Enter") runTriage(); });
-$("org").addEventListener("change", () => { loadCves(); loadServices(); runTriage(); });
+$("org").addEventListener("change", () => { loadCves(); loadServices(); runTriage(); $("posture").innerHTML = ""; });
 $("liveOp").addEventListener("change", fillLiveSvc);
+$("postureBtn").addEventListener("click", loadPosture);
 $("assessBtn").addEventListener("click", assessLive);
 $("liveBtn").addEventListener("click", () => liveChange(
   { path: "/api/live", body: { op: $("liveOp").value, service: $("liveSvc").value, cve: cve(), org: org() } },

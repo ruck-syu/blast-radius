@@ -64,6 +64,7 @@ dry-run/template mode with the guardrail enforced. `.env` is read at startup
 python -m agent.triage CVE-2021-44228 [--org heldout] [--json] [--compare-fixes]
 python -m agent.act CVE-2021-44228 [--verdicts ACT_NOW] [--pr]
 python -m agent.mcp_agent CVE-2021-44228 [--org heldout] [--allow-actions]  # Claude picks tools over MCP
+python -m agent.mcp_agent CVE-2021-44228 --offline     # no key: fixed tool sequence, same MCP loop and checks
 python -m agent.mcp_agent --question "Is d-checkout-api exposed to CVE-2021-44228, and how does public traffic reach it?"
 python -m agent.live expose d-notify-svc | adopt d-search-api --cve CVE-2021-44228 | list | revert
 python -m mcp_server.server   # MCP stdio transport for external clients
@@ -75,6 +76,11 @@ graph returned so far, giving a one-line reason per call (printed as the trace).
 Verdicts it submits are re-derived from the `evaluate_rules` output it saw, and
 each service's proof path is verified edge by edge; disagreements are flagged.
 Needs `ANTHROPIC_API_KEY` (model `LLM_MODEL`, default `claude-opus-5-5`).
+`--offline` swaps Claude for `agent/offline_planner.py`, a fixed policy (not a
+model): get_cve, score_risk, evaluate_rules per service, find_owner for ACT_NOW,
+rank_criticality, then verdicts from the rules. It goes through the same MCP
+client and checks, so the loop runs without a key and gives a baseline to
+compare Claude's tool choices against.
 
 Every reachable service also gets an **exposure proof**: the shortest public
 route (`Endpoint -ROUTES_TO-> Service -CALLS->* Service`), verified edge by
@@ -95,7 +101,9 @@ vulnerable package → CVE.
   digest of what came back) over Server-Sent Events, then a findings table
   showing whether each verdict agrees with the rules and the proof verified.
   *Approve* acts only on ACT_NOW findings that pass both checks: a human in
-  the loop on top of the guardrail. Disabled with a note when no key is set.
+  the loop on top of the guardrail. Disabled with a note when no key is set;
+  *Offline planner (no model)* runs the same MCP loop, trace and checks with
+  a fixed tool sequence instead, labelled as such.
 - **Live change**: expose a service to the internet or make a service adopt
   the vulnerable package. *Check in sandbox* predicts the outcome the way the
   pre-merge gate does; *Apply* changes the live graph through `apply_change`,

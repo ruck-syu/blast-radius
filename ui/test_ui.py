@@ -67,6 +67,15 @@ def main() -> None:
             check("investigate without key explains", ev and ev[-1]["type"] == "error"
                   and "ANTHROPIC_API_KEY" in ev[-1]["error"])
 
+        ev = sse(f"/api/investigate?org=dev&cve={CVE}&planner=offline")
+        done = ev[-1]
+        check("offline planner runs without a key, labelled, all findings check out",
+              done["type"] == "done" and done["planner"] == "offline"
+              and len(done["findings"]) == len(t["results"])
+              and all(f["verdict_agrees"] and f["proof"]["verified"] for f in done["findings"])
+              and any(e["type"] == "text" and "no model" in e["text"] for e in ev),
+              f"{len(done.get('findings', []))} findings")
+
         llm, state = scripted("dev")
         server.AGENT_LLM = llm
         check("config reports agent", get("/api/config")["agent_llm"])

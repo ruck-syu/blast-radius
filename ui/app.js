@@ -203,9 +203,10 @@ function renderFindings(out) {
   if (!out.findings.length) { el.innerHTML = `<div class="refuse">No findings submitted (${esc(out.stop)}). ${esc(out.summary)}</div>`; return; }
   const approvable = out.findings.filter((f) => f.verdict === "ACT_NOW" && f.verdict_agrees && f.proof.verified);
   state.findings = approvable.map((f) => f.service);
-  el.innerHTML = `<div class="ok"><b>Claude:</b> ${esc(out.summary)} ` +
+  const who = out.planner === "offline" ? "Offline planner (no model)" : "Claude";
+  el.innerHTML = `<div class="ok"><b>${who}:</b> ${esc(out.summary)} ` +
     `<span class="kv">${out.trace.length} tool calls · ${(out.total_latency_ms / 1000).toFixed(1)}s · stop: ${esc(out.stop)}</span></div>` +
-    `<table class="ftable"><tr><th>service</th><th>Claude's verdict</th><th>rules agree?</th><th>proof in graph</th><th>reason</th></tr>` +
+    `<table class="ftable"><tr><th>service</th><th>${out.planner === "offline" ? "planner" : "Claude"}'s verdict</th><th>rules agree?</th><th>proof in graph</th><th>reason</th></tr>` +
     out.findings.map((f) => `<tr><td>${esc(f.service)}</td><td><span class="pill ${f.verdict}">${f.verdict}</span></td>` +
       `<td>${f.verdict_agrees ? `<span class="okmark">✓ agrees</span>` : `<span class="badmark">✗ rules say ${esc(f.rule_verdict || "nothing (not evaluated)")}</span>`}</td>` +
       `<td>${f.proof.verified ? `<span class="okmark">✓</span>` : `<span class="badmark" title="${esc(f.proof.detail)}">✗ ${esc(f.proof.detail)}</span>`}</td>` +
@@ -220,18 +221,23 @@ function renderFindings(out) {
   });
 }
 
-function investigate() {
+function investigate(offline = false) {
   if (es) es.close();
   $("trace").innerHTML = ""; $("findings").innerHTML = ""; $("agentNote").textContent = "";
-  const q = $("question").value.trim();
-  const url = `/api/investigate?org=${org()}&cve=${encodeURIComponent(cve())}&question=${encodeURIComponent(q)}`;
-  $("askBtn").disabled = true; $("askBtn").textContent = "Investigating…";
-  const done = () => { es.close(); es = null; $("askBtn").disabled = false; $("askBtn").textContent = "Investigate"; };
+  const q = offline ? "" : $("question").value.trim();
+  const url = `/api/investigate?org=${org()}&cve=${encodeURIComponent(cve())}&question=${encodeURIComponent(q)}` +
+    (offline ? "&planner=offline" : "");
+  const btn = offline ? $("offlineBtn") : $("askBtn"), label = btn.textContent;
+  $("askBtn").disabled = $("offlineBtn").disabled = true; btn.textContent = "Investigating…";
+  const done = () => {
+    es.close(); es = null; btn.textContent = label;
+    $("askBtn").disabled = !(state.config && state.config.agent_llm); $("offlineBtn").disabled = false;
+  };
   es = new EventSource(url);
   es.onmessage = (m) => {
     const e = JSON.parse(m.data), li = document.createElement("li");
     if (e.type === "start") {
-      $("agentNote").textContent = `Claude discovered ${e.tools_offered.length} tools over MCP: ${e.tools_offered.join(", ")}`;
+      $("agentNote").textContent = `${offline ? "The offline planner (no model) was offered" : "Claude discovered"} ${e.tools_offered.length} tools over MCP: ${e.tools_offered.join(", ")}`;
       return;
     }
     if (e.type === "text") { li.className = "say"; li.textContent = e.text; }
@@ -432,8 +438,9 @@ $("liveBtn").addEventListener("click", () => liveChange(
 $("revertBtn").addEventListener("click", () => liveChange(
   { path: "/api/live_revert", body: { org: org() } },
   (out) => `reverted ${out.endpoints} endpoint(s), ${out.dependencies} dependency edge(s)`));
-$("askBtn").addEventListener("click", investigate);
-$("question").addEventListener("keydown", (e) => { if (e.key === "Enter") investigate(); });
+$("askBtn").addEventListener("click", () => investigate());
+$("offlineBtn").addEventListener("click", () => investigate(true));
+$("question").addEventListener("keydown", (e) => { if (e.key === "Enter" && !$("askBtn").disabled) investigate(); });
 
 $("simBtn").addEventListener("click", async () => {
   $("sim").innerHTML = "<p class='hint'>simulating each fix in a sandbox graph copy…</p>";
@@ -467,7 +474,8 @@ window.addEventListener("resize", () => { if (state.triage) renderMap(); });
       w(state.config.slack_live, state.config.slack_live ? "Slack: live" : "Slack: dry-run");
     if (!state.config.agent_llm) {
       $("askBtn").disabled = true;
-      $("agentNote").innerHTML = "Set <span class='mono'>ANTHROPIC_API_KEY</span> in <span class='mono'>.env</span> and restart the UI to let Claude investigate. Everything else on this page runs without it.";
+      $("agentNote").innerHTML = "Set <span class='mono'>ANTHROPIC_API_KEY</span> in <span class='mono'>.env</span> and restart the UI to let Claude investigate. " +
+        "Without a key, <b>Offline planner</b> runs a fixed tool sequence (no model) through the same MCP server, checks and approval. Everything else on this page runs without it.";
     }
   } catch (e) { /* non-fatal */ }
   loadCves();

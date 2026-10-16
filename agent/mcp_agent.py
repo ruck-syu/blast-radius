@@ -17,6 +17,7 @@ graph has shown so far. Guardrails stay in code:
 Usage:
   python -m agent.mcp_agent CVE-2021-44228 [--org dev] [--allow-actions] [--json]
   python -m agent.mcp_agent --question "Which public services ..." [--org heldout]
+  python -m agent.mcp_agent CVE-2021-44228 --offline   # no key: fixed-policy planner, not a model
 
 Config: ANTHROPIC_API_KEY (or an `ant auth login` profile), LLM_MODEL
 (default claude-opus-5-5), LLM_EFFORT (default medium).
@@ -309,16 +310,22 @@ def main() -> None:
     ap.add_argument("--max-turns", type=int, default=MAX_TURNS)
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--verbose", action="store_true", help="show MCP server logs")
+    ap.add_argument("--offline", action="store_true",
+                    help="no model: a fixed rule-following planner drives the same MCP loop")
     args = ap.parse_args()
     if not args.cve and not args.question:
         ap.error("give a CVE ID or --question")
+    llm = None
+    if args.offline:
+        from .offline_planner import offline_llm
+        llm = offline_llm(args.cve, args.org)
     question = args.question or (
         f"Triage {args.cve}: which services are affected, which are reachable from a "
         f"public endpoint, what verdict does each get, and who owns the ones to act on now?")
 
     try:
         out = asyncio.run(run_agent(question, args.org, cve=args.cve,
-                                    allow_actions=args.allow_actions,
+                                    allow_actions=args.allow_actions, llm=llm,
                                     max_turns=args.max_turns, verbose=args.verbose))
     except BaseExceptionGroup as eg:  # MCP client task groups wrap the real error
         while isinstance(eg, BaseExceptionGroup):

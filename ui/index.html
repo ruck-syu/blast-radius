@@ -44,6 +44,21 @@
     </section>
   </div>
 
+  <section class="card" id="liveCard">
+    <h2>Live change <span class="kv">mutate the live graph, re-triage instantly: no retraining, no reload</span></h2>
+    <div class="controls">
+      <select id="liveOp" aria-label="change">
+        <option value="expose">Expose to the internet (new public endpoint)</option>
+        <option value="adopt">Adopt the vulnerable package (new dependency)</option>
+      </select>
+      <select id="liveSvc" aria-label="service"></select>
+      <button id="liveBtn" disabled>Apply to live graph</button>
+      <button id="revertBtn" class="ghost" disabled>Revert live changes</button>
+    </div>
+    <div id="liveChanges"></div>
+    <div id="liveDiff"></div>
+  </section>
+
   <section class="card" id="investigateCard">
     <h2>Investigate with Claude <span class="kv">model picks graph tools over MCP; code re-checks every verdict and proof</span></h2>
     <div class="controls">

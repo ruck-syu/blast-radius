@@ -3,7 +3,8 @@
 Kinds: add_dependency (service USEs package), add_endpoint (new route),
 add_deployment (new deploy record), add_cve (new advisory + optional fix
 link). All parameterized upserts from queries/apply_*.cypher; referenced
-nodes/packages must already exist (validated, else ValueError).
+nodes/packages must already exist (validated, else ValueError). New endpoints
+and USES edges carry a `source` provenance tag so a batch can be reverted.
 """
 from __future__ import annotations
 
@@ -26,16 +27,17 @@ def apply_change(kind: str, org: str = "dev", service: str = "", purl: str = "",
                version: str = "", by: str = "", timestamp: int = 0,
                cvss: float = 0.0, epss: float = 0.0, summary: str = "",
                published: str = "", affects_purl: str = "", vuln_range: str = "",
-               fixed_purl: str = "") -> dict:
+               fixed_purl: str = "", source: str = "apply_change") -> dict:
     t0 = time.time()
     if kind == "add_dependency":
         rows, lat = graph.run(org, "apply_add_dependency",
-                              {"service": service, "purl": purl})
+                              {"service": service, "purl": purl, "source": source})
         _req(rows, f"service {service!r} or package {purl!r}")
         detail = {"edge_id": rows[0][0]}
     elif kind == "add_endpoint":
         rows, lat = graph.run(org, "apply_add_endpoint",
-                              {"path": path, "public": bool(public), "service": service})
+                              {"path": path, "public": bool(public), "service": service,
+                               "source": source})
         _req(rows, f"service {service!r}")
         detail = {"endpoint_id": rows[0][0]}
     elif kind == "add_deployment":

@@ -45,8 +45,8 @@ python -m ui.server                  # Phase 6: http://127.0.0.1:8765
 ```
 
 Tests that act write to a temp action log and delete the Decision nodes they
-create. `python -m agent.reset_demo` clears all Decision nodes and the action
-log before a demo recording.
+create. `python -m agent.reset_demo` clears all Decision nodes, live changes
+and the action log before a demo recording.
 
 Live deployment: point the env at FalkorDB Cloud or any self-hosted instance
 (`FALKORDB_HOST/PORT/USERNAME/PASSWORD` in `.env`) — no code changes needed;
@@ -64,6 +64,7 @@ python -m agent.triage CVE-2021-44228 [--org heldout] [--json] [--compare-fixes]
 python -m agent.act CVE-2021-44228 [--verdicts ACT_NOW] [--pr]
 python -m agent.mcp_agent CVE-2021-44228 [--org heldout] [--allow-actions]  # Claude picks tools over MCP
 python -m agent.mcp_agent --question "Is d-checkout-api exposed to CVE-2021-44228, and how does public traffic reach it?"
+python -m agent.live expose d-notify-svc | adopt d-search-api --cve CVE-2021-44228 | list | revert
 python -m mcp_server.server   # MCP stdio transport for external clients
 ```
 
@@ -94,13 +95,17 @@ vulnerable package → CVE.
   showing whether each verdict agrees with the rules and the proof verified.
   *Approve* acts only on ACT_NOW findings that pass both checks: a human in
   the loop on top of the guardrail. Disabled with a note when no key is set.
+- **Live change**: expose a service to the internet or make a service adopt
+  the vulnerable package; the live graph changes through `apply_change`, the
+  page re-triages and shows what flipped (e.g. SCHEDULE → ACT_NOW with the new
+  route verified). Revert removes exactly those changes (provenance-tagged).
 - **Fix simulation**, **Actions** (ticket + notify, guardrail drill with a
   forged proof), **Decisions** recorded in the graph, and the **Action log**.
 
 API (documented in the `ui/server.py` docstring): `GET /api/triage`,
 `/api/compare`, `/api/cves`, `/api/config`, `/api/decisions`,
-`/api/action_log`, `/api/investigate` (SSE); `POST /api/act`,
-`/api/refusal_drill`.
+`/api/action_log`, `/api/services`, `/api/live`, `/api/investigate` (SSE);
+`POST /api/act`, `/api/refusal_drill`, `/api/live`, `/api/live_revert`.
 
 Tools (all parameterized Cypher from `queries/`, see below):
 `get_cve`, `find_affected_services`, `check_reachability`, `dependency_path`,
@@ -207,7 +212,7 @@ See [`AI_USAGE.md`](AI_USAGE.md) (every AI tool used and for what, updated per p
 
 - [x] Public source repository (this repo — push to publish)
 - [x] Live deployment **or** complete local setup (local compose + FalkorDB Cloud env support; see Setup)
-- [ ] Demo video — record with [`docs/demo-script.md`](docs/demo-script.md) (7 steps, ~5 min)
+- [ ] Demo video — record with [`docs/demo-script.md`](docs/demo-script.md) (7 steps, ~6 min)
 
 ## Related work
 

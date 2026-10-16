@@ -1,3 +1,4 @@
 falkordb>=1.0.0
 redis>=5.0.0
 mcp<2  # FastMCP API; v2 renamed FastMCP -> MCPServer
+anthropic>=1.0  # optional: LLM summary + agent.mcp_agent (Claude picks MCP tools)

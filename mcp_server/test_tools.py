@@ -97,6 +97,8 @@ def main() -> None:
     rk = rank_criticality(org, limit=100)
     check("rank 60 services", len(rk["ranking"]) == 60, f"{rk['latency_ms']}ms")
     check("call edges present", len(rk["call_graph_edges"]) > 0, str(len(rk["call_graph_edges"])))
+    pr = [x["pagerank"] for x in rk["ranking"]]
+    check("rank ordered by pagerank", pr == sorted(pr, reverse=True) and pr[0] > 0, str(pr[:3]))
     rk5 = rank_criticality(org, limit=5)
     check("rank limit=5", len(rk5["ranking"]) == 5)
 

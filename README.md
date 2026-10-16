@@ -38,6 +38,7 @@ python -m agent.test_agent           # Phase 3: end-to-end triage
 python -m agent.test_simulation      # Phase 4: fix comparison
 python -m agent.test_actions         # Phase 5: guardrail accept/refuse
 python -m mcp_server.test_apply      # incremental updates + revert
+python -m agent.test_mcp_agent       # MCP agent: tool discovery, trace, verdict/proof checks (scripted LLM, no key)
 python -m benchmark.runner --org all # Phase 7: 3 systems, held-out numbers
 python -m ui.server                  # Phase 6: http://127.0.0.1:8765
 ```
@@ -55,11 +56,20 @@ dry-run/template mode with the guardrail enforced.
 ```bash
 python -m agent.triage CVE-2021-44228 [--org heldout] [--json] [--compare-fixes]
 python -m agent.act CVE-2021-44228 [--verdicts ACT_NOW] [--pr]
+python -m agent.mcp_agent CVE-2021-44228 [--org heldout] [--allow-actions]  # Claude picks tools over MCP
+python -m agent.mcp_agent --question "Is d-checkout-api exposed to CVE-2021-44228, and how does public traffic reach it?"
 python -m mcp_server.server   # MCP stdio transport for external clients
 ```
 
+`agent.mcp_agent` is an MCP client: it spawns the server over stdio, discovers
+the tools with `list_tools`, and Claude chooses each next call from what the
+graph returned so far, giving a one-line reason per call (printed as the trace).
+Verdicts it submits are re-derived from the `evaluate_rules` output it saw, and
+each service's proof path is verified edge by edge; disagreements are flagged.
+Needs `ANTHROPIC_API_KEY` (model `LLM_MODEL`, default `claude-opus-5-5`).
+
 Tools (all parameterized Cypher from `queries/`, see below):
-`find_affected_services`, `check_reachability`, `dependency_path`,
+`get_cve`, `find_affected_services`, `check_reachability`, `dependency_path`,
 `rank_criticality`, `find_owner`, `score_risk`, `evaluate_rules`,
 `simulate_fix`, `apply_change`, `create_ticket`, `notify_owner`, `open_fix_pr`.
 
@@ -105,9 +115,8 @@ Every query the product depends on lives in [`queries/`](queries/) (one file
 per traversal, one-line purpose comment each). Core traversals:
 `find_affected_services`, `check_reachability`, `dependency_path`,
 `score_risk` (risk formula in Cypher), `evaluate_rules` (named rules in
-Cypher), `rank_criticality` (call-graph degree centrality — a PageRank
-procedure replaces it once the exact FalkorDB procedure name is confirmed
-against the docs; we do not guess procedure names), plus guardrail
+Cypher), `rank_criticality` (FalkorDB `algo.pageRank` + `algo.betweenness`
+over the CALLS graph, procedure names verified live), plus guardrail
 (`verify_edge`, `verify_path_start`, `verify_path_cve_anchor`,
 `write_decision`), simulation (`upgrade_path`, `upgrade_uses`,
 `upgrade_depends`, `remove_fixed_affects`), incremental updates (`apply_*`),

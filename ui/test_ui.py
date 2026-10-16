@@ -109,6 +109,11 @@ def main() -> None:
         check("sandbox predicts the flip without touching live",
               any(f["service"] == hidden and f["after"] == "ACT_NOW" for f in pred["findings"])
               and not get("/api/live?org=dev")["changes"])
+        act = next(r["service"] for r in t["results"] if r["verdict"] == "ACT_NOW")
+        pin = post("/api/assess", {"service": act, "adds": [t["cve"]["fixed_purl"]],
+                                   "removes": [t["cve"]["vuln_purl"]], "org": "dev"})
+        check("sandbox credits a pinned fix", not pin["findings"] and any(
+            f["service"] == act and f["before"] == "ACT_NOW" for f in pin["resolved"]), act)
         try:
             post("/api/live", {"op": "expose", "service": hidden, "org": "dev"})
             post("/api/live", {"op": "adopt", "service": clean, "cve": CVE, "org": "dev"})

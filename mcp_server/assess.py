@@ -1,9 +1,15 @@
 """assess_change: what would a proposed change do to the org's exposure?
 
 Pre-merge check. GRAPH.COPY the live graph into a private sandbox, apply the
-proposed change there (a service starts using packages, and/or a new public
+proposed change there (a service starts using packages and/or a new public
 endpoint routes to it), then score every CVE on both graphs and diff the
-verdicts. The live graph is never touched; the sandbox is always deleted.
+verdicts: what gets worse, and what the change resolves.
+
+Removals mean "the service no longer resolves this purl anywhere in its tree"
+(a version pin, or a component gone from its SBOM). The package graph is shared
+between services, so removals are not edits: a (CVE, service) pair survives only
+if some dependency path avoids every removed purl, and its evidence chain is
+that path. The live graph is never touched; the sandbox is always deleted.
 
 New transitive exposure is caught too: adding a package that DEPENDS_ON* a
 vulnerable one shows up with the full dependency chain as evidence.
@@ -54,26 +60,48 @@ def _chain(path: dict | None) -> list[str]:
             for n in path["nodes"]]
 
 
+def _apply_removals(key: str, verdicts: dict, service: str, removed: list[str]) -> None:
+    """Drop or re-route `service`'s pairs whose every dependency path hits a removed purl."""
+    for cve, svc in [k for k in verdicts if k[1] == service]:
+        rows, _ = graph.run_on(key, "dependency_path_avoiding",
+                               {"cve": cve, "service": service, "removed": removed})
+        if not rows:
+            del verdicts[(cve, svc)]
+        else:
+            verdicts[(cve, svc)].update(path=graph.serialize_path(rows[0][0]), depth=rows[0][1])
+
+
 def assess_change(service: str, adds: list[str] | None = None, expose_path: str = "",
-                  org: str = "dev") -> dict:
-    """Diff verdicts before/after `service` adds packages `adds` and/or gets a public route."""
+                  org: str = "dev", removes: list[str] | None = None) -> dict:
+    """Diff verdicts before/after `service` adds packages `adds`, drops `removes`,
+    and/or gets a public route."""
     t0 = time.time()
-    adds = list(adds or [])
-    if not adds and not expose_path:
-        raise ValueError("assess_change: give packages to add and/or an expose_path")
+    adds, removes = list(adds or []), list(removes or [])
+    if not adds and not removes and not expose_path:
+        raise ValueError("assess_change: give packages to add/remove and/or an expose_path")
     live = graph_name(org)
     if service not in {r[0] for r in graph.run_on(live, "list_services", {})[0]}:
         raise ValueError(f"assess_change: service {service!r} not in the {org} graph")
     unknown = [p for p in adds
                if not graph.run_on(live, "package_exists", {"purl": p})[0][0][0]]
     known = [p for p in adds if p not in unknown]
+    removed = [p for p in removes
+               if graph.run_on(live, "service_resolves", {"service": service, "purl": p})[0][0][0]]
 
     cve_ids = list_cves(live)
     before = _verdicts(live, cve_ids)
     sb = f"{live}__assess_{uuid.uuid4().hex[:8]}"
     graph.connect().select_graph(live).copy(sb)
     try:
+        direct, pulled_in = [], []
         for purl in known:
+            # already in the tree through an earlier add (a flattened SBOM lists the
+            # whole subtree): keep the real transitive chain, don't add a direct edge
+            if graph.run_on(sb, "service_resolves",
+                            {"service": service, "purl": purl})[0][0][0]:
+                pulled_in.append(purl)
+                continue
+            direct.append(purl)
             graph.run_on(sb, "apply_add_dependency",
                          {"service": service, "purl": purl, "source": "assess"})
         if expose_path:
@@ -81,6 +109,8 @@ def assess_change(service: str, adds: list[str] | None = None, expose_path: str 
                          {"path": expose_path, "public": True, "service": service,
                           "source": "assess"})
         after = _verdicts(sb, cve_ids)
+        if removed:
+            _apply_removals(sb, after, service, removed)
     finally:
         _delete_sandbox(sb)
 
@@ -98,11 +128,22 @@ def assess_change(service: str, adds: list[str] | None = None, expose_path: str 
                          "depth": a["depth"], "risk": a["risk"],
                          "chain": _chain(a["path"]),
                          "new_exposure": b is None})
+    resolved = []
+    for (cve, svc), b in before.items():
+        a = after.get((cve, svc))
+        if a is None or RANK[a["verdict"]] < RANK[b["verdict"]]:
+            resolved.append({"cve": cve, "service": svc, "before": b["verdict"],
+                             "after": a["verdict"] if a else None})
+    resolved.sort(key=lambda f: (-RANK[f["before"]], f["cve"], f["service"]))
     findings.sort(key=lambda f: (-RANK[f["after"]], -f["risk"]))
     worst = findings[0]["after"] if findings else None
-    log.info("assess_change org=%s service=%s adds=%d expose=%s findings=%d",
-             org, service, len(known), bool(expose_path), len(findings))
-    return {"org": org, "service": service, "adds": known, "unknown_packages": unknown,
+    log.info("assess_change org=%s service=%s adds=%d removes=%d expose=%s findings=%d "
+             "resolved=%d", org, service, len(direct), len(removed), bool(expose_path),
+             len(findings), len(resolved))
+    return {"org": org, "service": service, "adds": direct, "pulled_in": pulled_in,
+            "unknown_packages": unknown,
+            "removes": removed, "not_used": [p for p in removes if p not in removed],
             "expose_path": expose_path or None, "findings": findings, "worst": worst,
+            "resolved": resolved,
             "cves_checked": len(cve_ids),
             "latency_ms": round((time.time() - t0) * 1000, 1)}

@@ -170,7 +170,8 @@ class Handler(BaseHTTPRequestHandler):
             if url.path == "/api/assess":
                 return _json(self, assess_change(body["service"], body.get("adds") or [],
                                                  body.get("expose") or "",
-                                                 body.get("org", "dev")))
+                                                 body.get("org", "dev"),
+                                                 body.get("removes") or []))
             if url.path == "/api/live_revert":
                 return _json(self, live.revert(body.get("org", "dev")))
             return _json(self, {"error": f"unknown route {url.path}"}, 404)

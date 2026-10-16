@@ -157,9 +157,10 @@ def _brief(tool: str, r: dict | None) -> str:
         return f"risk reduction {r['reduction'].get('total_risk')}"
     if tool == "assess_change":
         f = r.get("findings", [])
-        return (f"{len(f)} verdicts worse, worst {r.get('worst')}" if f
-                else "no new exposure") + (f"; unknown {r['unknown_packages']}"
-                                           if r.get("unknown_packages") else "")
+        return ((f"{len(f)} verdicts worse, worst {r.get('worst')}" if f
+                 else "no new exposure")
+                + (f"; resolves {len(r['resolved'])}" if r.get("resolved") else "")
+                + (f"; unknown {r['unknown_packages']}" if r.get("unknown_packages") else ""))
     if "accepted" in r:
         return "accepted" if r["accepted"] else f"REFUSED: {r.get('reason')}"
     return ""

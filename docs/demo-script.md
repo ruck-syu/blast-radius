@@ -33,6 +33,7 @@ Use CVE-2021-44228, dev org.
 7. **Close (5:15).** Decisions recorded in the graph (ABOUT CVE/service,
    FIRED rules) and the action log with accepts and the refusal.
 
-No key? Skip step 3; the header badge shows "Claude: no API key" and every
-other step runs without it. `python -m agent.mcp_agent CVE-2021-44228` shows
-the same trace in a terminal.
+No key? In step 3 click *Offline planner (no model)* instead: the same MCP
+loop, trace, checks and Approve, driven by a fixed tool sequence and labelled
+as such. `python -m agent.mcp_agent CVE-2021-44228 [--offline]` shows the same
+trace in a terminal.

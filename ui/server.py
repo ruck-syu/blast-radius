@@ -204,14 +204,19 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(f"data: {json.dumps(event)}\n\n".encode())
             self.wfile.flush()
 
-        if not agent_available():
+        offline = qs.get("planner", [""])[0] == "offline"
+        if not offline and not agent_available():
             send({"type": "error", "error": "ANTHROPIC_API_KEY is not set: add it to .env "
-                  "and restart the UI to let Claude investigate."})
+                  "and restart the UI to let Claude investigate, or run the offline planner."})
             return
         from agent.mcp_agent import run_agent
+        llm = AGENT_LLM
+        if offline:
+            from agent.offline_planner import offline_llm
+            llm = offline_llm(cve, org)
         try:
-            out = asyncio.run(run_agent(question, org, cve=cve, llm=AGENT_LLM, on_event=send))
-            send({"type": "done", **out})
+            out = asyncio.run(run_agent(question, org, cve=cve, llm=llm, on_event=send))
+            send({"type": "done", "planner": "offline" if offline else "claude", **out})
         except (BrokenPipeError, ConnectionResetError):
             log.info("investigate client disconnected")
         except BaseException as e:  # noqa: BLE001 - MCP task groups wrap the real error

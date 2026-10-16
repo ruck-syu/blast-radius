@@ -3,7 +3,7 @@
 // Params: $cve, $service, $removed (list of purls). No row = the change removes the CVE.
 MATCH (c:CVE {id: $cve})-[:AFFECTS]->(vuln:Package)
 MATCH dep = (s:Service {name: $service})-[:USES]->(:Package)-[:DEPENDS_ON*0..6]->(vuln)
-WHERE none(n IN nodes(dep) WHERE n.purl IN $removed)
+WHERE none(n IN nodes(dep) WHERE coalesce(n.purl, '') IN $removed)
 RETURN dep AS path, length(dep) AS depth
 ORDER BY depth ASC
 LIMIT 1

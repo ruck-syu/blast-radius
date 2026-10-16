@@ -23,33 +23,46 @@ from . import graph
 
 log = logging.getLogger("blast-radius.mcp")
 ROOT = Path(__file__).resolve().parent.parent
-ACTION_LOG = ROOT / "actions" / "log.jsonl"
+
+
+def action_log_path() -> Path:
+    """actions/log.jsonl, or BLAST_ACTION_LOG (tests point it at a temp file)."""
+    return Path(os.getenv("BLAST_ACTION_LOG") or ROOT / "actions" / "log.jsonl")
 
 
 def _append_log(entry: dict) -> None:
-    ACTION_LOG.parent.mkdir(parents=True, exist_ok=True)
+    path = action_log_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
     entry = {"ts": int(time.time()), **entry}
-    with ACTION_LOG.open("a") as f:
+    with path.open("a") as f:
         f.write(json.dumps(entry) + "\n")
+
+
+def _verify_chain(org: str, path: dict | None) -> tuple[list[int], str]:
+    """Chain integrity + every edge exists in FalkorDB. Returns (node ids, error or '')."""
+    if not isinstance(path, dict) or not path.get("nodes"):
+        return [], "refused: missing proof_path"
+    nodes, edges = path["nodes"], path.get("edges") or []
+    ids = [n["id"] for n in nodes]
+    if len(ids) != len(edges) + 1:
+        return [], "refused: malformed proof_path (nodes/edges mismatch)"
+    for i, e in enumerate(edges):
+        if e["from"] != ids[i] or e["to"] != ids[i + 1]:
+            return [], f"refused: proof_path chain broken at edge {i}"
+        rows, _ = graph.run(org, "verify_edge",
+                            {"src": e["from"], "dst": e["to"], "rel": e["type"]})
+        if not rows[0][0]:
+            return [], (f"refused: proof edge {i} "
+                        f"({e['from']})-[:{e['type']}]->({e['to']}) not in graph")
+    return ids, ""
 
 
 def verify_proof_path(org: str, proof_path: dict | None, service: str,
                       cve: str | None = None) -> tuple[bool, str, list[int]]:
     """Guardrail verification. Returns (ok, reason, node_id_list)."""
-    if not isinstance(proof_path, dict) or not proof_path.get("nodes"):
-        return False, "refused: missing proof_path", []
-    nodes, edges = proof_path["nodes"], proof_path.get("edges") or []
-    ids = [n["id"] for n in nodes]
-    if len(ids) != len(edges) + 1:
-        return False, "refused: malformed proof_path (nodes/edges mismatch)", []
-    for i, e in enumerate(edges):
-        if e["from"] != ids[i] or e["to"] != ids[i + 1]:
-            return False, f"refused: proof_path chain broken at edge {i}", []
-        rows, _ = graph.run(org, "verify_edge",
-                            {"src": e["from"], "dst": e["to"], "rel": e["type"]})
-        if not rows[0][0]:
-            return False, (f"refused: proof edge {i} "
-                           f"({e['from']})-[:{e['type']}]->({e['to']}) not in graph"), []
+    ids, err = _verify_chain(org, proof_path)
+    if err:
+        return False, err, []
     rows, _ = graph.run(org, "verify_path_start", {"service": service, "nid": ids[0]})
     if not rows[0][0]:
         return False, f"refused: proof does not start at service {service!r}", []
@@ -58,6 +71,21 @@ def verify_proof_path(org: str, proof_path: dict | None, service: str,
         if not rows[0][0]:
             return False, f"refused: proof does not end at a package {cve} affects", []
     return True, "proof verified against graph", ids
+
+
+def verify_exposure_path(org: str, path: dict | None,
+                         service: str) -> tuple[bool, str]:
+    """Exposure proof: public Endpoint -ROUTES_TO-> Service -CALLS*-> service, every edge in graph."""
+    ids, err = _verify_chain(org, path)
+    if err:
+        return False, err.removeprefix("refused: ").replace("proof_path", "exposure path")
+    rows, _ = graph.run(org, "verify_public_endpoint", {"nid": ids[0]})
+    if not rows[0][0]:
+        return False, "exposure path does not start at a public endpoint"
+    rows, _ = graph.run(org, "verify_path_start", {"service": service, "nid": ids[-1]})
+    if not rows[0][0]:
+        return False, f"exposure path does not end at service {service!r}"
+    return True, "public route verified against graph"
 
 
 def _decision_id(action: str, cve: str, service: str) -> str:

@@ -39,9 +39,14 @@ python -m agent.test_simulation      # Phase 4: fix comparison
 python -m agent.test_actions         # Phase 5: guardrail accept/refuse
 python -m mcp_server.test_apply      # incremental updates + revert
 python -m agent.test_mcp_agent       # MCP agent: tool discovery, trace, verdict/proof checks (scripted LLM, no key)
+python -m ui.test_ui                 # UI API: triage, SSE investigate, approve, refusal drill
 python -m benchmark.runner --org all # Phase 7: 3 systems, held-out numbers
 python -m ui.server                  # Phase 6: http://127.0.0.1:8765
 ```
+
+Tests that act write to a temp action log and delete the Decision nodes they
+create. `python -m agent.reset_demo` clears all Decision nodes and the action
+log before a demo recording.
 
 Live deployment: point the env at FalkorDB Cloud or any self-hosted instance
 (`FALKORDB_HOST/PORT/USERNAME/PASSWORD` in `.env`) — no code changes needed;
@@ -49,7 +54,8 @@ Live deployment: point the env at FalkorDB Cloud or any self-hosted instance
 `LLM_PROVIDER` + `ANTHROPIC_API_KEY`/`OPENAI_API_KEY` (summary wording),
 `GITHUB_TOKEN` + `DEMO_REPO` (real tickets on our own demo repo),
 `SLACK_WEBHOOK` (real notifications). Without them the product runs fully in
-dry-run/template mode with the guardrail enforced.
+dry-run/template mode with the guardrail enforced. `.env` is read at startup
+(real environment variables win), so keys put there reach every entry point.
 
 ## Usage
 
@@ -67,6 +73,34 @@ graph returned so far, giving a one-line reason per call (printed as the trace).
 Verdicts it submits are re-derived from the `evaluate_rules` output it saw, and
 each service's proof path is verified edge by edge; disagreements are flagged.
 Needs `ANTHROPIC_API_KEY` (model `LLM_MODEL`, default `claude-opus-5-5`).
+
+Every reachable service also gets an **exposure proof**: the shortest public
+route (`Endpoint -ROUTES_TO-> Service -CALLS->* Service`), verified edge by
+edge like the dependency proof, with the start checked to be a public endpoint.
+Together the two proofs are the full attack chain: internet → service →
+vulnerable package → CVE.
+
+### Web UI
+
+`python -m ui.server`, then http://127.0.0.1:8765:
+
+- **Blast map**: layered graph of public endpoints → affected services →
+  dependency chain → vulnerable package → CVE. Hover a service to trace its
+  paths, click to inspect.
+- **Ranked services** + **Why**: verdict, risk, rules, owner, and the attack
+  chain with both proofs marked verified.
+- **Investigate with Claude**: streams the MCP agent's trace live (tool, reason,
+  digest of what came back) over Server-Sent Events, then a findings table
+  showing whether each verdict agrees with the rules and the proof verified.
+  *Approve* acts only on ACT_NOW findings that pass both checks: a human in
+  the loop on top of the guardrail. Disabled with a note when no key is set.
+- **Fix simulation**, **Actions** (ticket + notify, guardrail drill with a
+  forged proof), **Decisions** recorded in the graph, and the **Action log**.
+
+API (documented in the `ui/server.py` docstring): `GET /api/triage`,
+`/api/compare`, `/api/cves`, `/api/config`, `/api/decisions`,
+`/api/action_log`, `/api/investigate` (SSE); `POST /api/act`,
+`/api/refusal_drill`.
 
 Tools (all parameterized Cypher from `queries/`, see below):
 `get_cve`, `find_affected_services`, `check_reachability`, `dependency_path`,

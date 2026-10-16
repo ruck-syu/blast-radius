@@ -13,3 +13,4 @@ Disclosure of AI assistant usage (per competition rules).
 | 2026-10-12 | OpenCode (Muse Spark) | Phase 7: question bank (27/org), 3 benchmark systems, runner + metrics + ablation, results table + methodology |
 | 2026-10-12 | OpenCode (Muse Spark) | Phase 8: apply_change tool, full README per spec s9, demo script, fresh-machine rebuild validation, repo commit |
 | 2026-10-15 | Claude Code (Claude Opus 5.5) | Track-fit gaps: MCP-client agent with model-driven tool selection + reason trace, PageRank/betweenness criticality, get_cve tool, write_decision empty-rules fix, test_mcp_agent.py acceptance |
+| 2026-10-17 | Claude Code (Claude Opus 5.5) | Verified exposure proofs, UI redesign (blast map, attack chain, live Investigate over SSE with human approval), test isolation + reset_demo, `.env` loading, ui/test_ui.py acceptance |

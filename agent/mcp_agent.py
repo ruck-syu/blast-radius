@@ -128,6 +128,37 @@ def claude_llm(model: str | None = None, effort: str | None = None) -> Callable:
     return call
 
 
+def _brief(tool: str, r: dict | None) -> str:
+    """One-line digest of a tool result for the live trace."""
+    if not isinstance(r, dict):
+        return ""
+    if tool == "get_cve":
+        return (f"cvss {r.get('cvss')}, KEV {r.get('in_kev')}, {r.get('vuln_purl')}"
+                if r.get("found") else "unknown CVE")
+    if tool == "score_risk" and r.get("ranked"):
+        top = r["ranked"][0]
+        return (f"{r['count']} services, {sum(x['reachable'] for x in r['ranked'])} reachable; "
+                f"top {top['service']} risk {top['risk']}")
+    if tool == "find_affected_services":
+        return f"{r.get('count', 0)} affected services"
+    if tool == "check_reachability":
+        return (f"reachable via {r['entries'][0]['entry_point']} ({len(r['entries'])} routes)"
+                if r.get("reachable") else "no public route")
+    if tool == "dependency_path":
+        return (f"depth {r['dependency']['depth']}" if r.get("affected") else "not affected")
+    if tool == "evaluate_rules":
+        return "fired: " + (", ".join(r.get("fired", [])) or "none")
+    if tool == "find_owner":
+        return f"{r.get('team')} ({r.get('slack_channel')})" if r.get("found") else "no owner"
+    if tool == "rank_criticality" and r.get("ranking"):
+        return "top: " + ", ".join(x["service"] for x in r["ranking"][:3])
+    if tool == "simulate_fix" and r.get("reduction"):
+        return f"risk reduction {r['reduction'].get('total_risk')}"
+    if "accepted" in r:
+        return "accepted" if r["accepted"] else f"REFUSED: {r.get('reason')}"
+    return ""
+
+
 def _short_args(args: dict) -> dict:
     return {k: ("<proof_path>" if k == "proof_path" else v) for k, v in args.items()}
 
@@ -169,8 +200,11 @@ def check_findings(submitted: dict, trace: list[dict], org: str, cve: str | None
 
 async def run_agent(question: str, org: str = "dev", cve: str | None = None,
                     allow_actions: bool = False, llm: Callable | None = None,
-                    max_turns: int = MAX_TURNS, verbose: bool = False) -> dict:
+                    max_turns: int = MAX_TURNS, verbose: bool = False,
+                    on_event: Callable[[dict], None] | None = None) -> dict:
+    """on_event (optional) receives start/text/step events as they happen (UI streaming)."""
     t0 = time.time()
+    emit = on_event or (lambda _e: None)
     llm = llm or claude_llm()
     allowed = READ_TOOLS | (ACTION_TOOLS if allow_actions else set())
     params = StdioServerParameters(command=sys.executable, args=["-m", "mcp_server.server"],
@@ -186,12 +220,17 @@ async def run_agent(question: str, org: str = "dev", cve: str | None = None,
                 listed = await session.list_tools()
                 tools = to_claude_tools(listed.tools, allowed)
                 system = SYSTEM + (ACTIONS_NOTE if allow_actions else "")
+                focus = f"CVE in focus: {cve}.\n" if cve and cve not in question else ""
                 messages: list[dict] = [{"role": "user", "content":
-                                         f"Org graph: {org}.\n\n{question}"}]
+                                         f"Org graph: {org}.\n{focus}\n{question}"}]
+                emit({"type": "start", "tools_offered": sorted(t["name"] for t in tools)})
 
                 for _ in range(max_turns):
-                    content, stop_reason = llm(system, messages, tools)
+                    content, stop_reason = await asyncio.to_thread(llm, system, messages, tools)
                     messages.append({"role": "assistant", "content": content})
+                    for b in content:
+                        if b.get("type") == "text" and b.get("text", "").strip():
+                            emit({"type": "text", "text": b["text"]})
                     if stop_reason == "pause_turn":
                         continue
                     if stop_reason in ("refusal", "max_tokens"):
@@ -227,8 +266,10 @@ async def run_agent(question: str, org: str = "dev", cve: str | None = None,
                             except json.JSONDecodeError:
                                 parsed = None
                         step.update(is_error=is_error, result=parsed,
-                                    error=text if is_error else None)
+                                    error=text if is_error else None,
+                                    brief=text if is_error else _brief(u["name"], parsed))
                         trace.append(step)
+                        emit({"type": "step", **{k: v for k, v in step.items() if k != "result"}})
                         results.append({"type": "tool_result", "tool_use_id": u["id"],
                                         "content": text, "is_error": is_error})
                     messages.append({"role": "user", "content": results})
@@ -284,6 +325,8 @@ def main() -> None:
         flag = " ERROR" if s["is_error"] else ""
         print(f"{s['step']:2d}. {s['tool']}({json.dumps(s['args'])}){flag}")
         print(f"    why: {s['reason']}")
+        if s.get("brief"):
+            print(f"    got: {s['brief']}")
     print(f"\n[{out['stop']}, {len(out['trace'])} tool calls, {out['total_latency_ms']:.0f}ms]")
     print(out["summary"])
     for f in out["findings"]:

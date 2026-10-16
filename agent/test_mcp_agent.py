@@ -13,6 +13,7 @@ import copy
 import json
 
 from .mcp_agent import run_agent, READ_TOOLS
+from .testkit import isolated_actions
 
 CVE = "CVE-2021-44228"
 
@@ -109,7 +110,8 @@ def main() -> None:
               f["ghost-svc"]["proof"]["detail"])
 
     llm, state = scripted("dev")
-    out = asyncio.run(run_agent(f"Triage {CVE}", "dev", cve=CVE, allow_actions=True, llm=llm))
+    with isolated_actions(("dev",)):
+        out = asyncio.run(run_agent(f"Triage {CVE}", "dev", cve=CVE, allow_actions=True, llm=llm))
     print("[dev, actions]")
     acts = out["actions"]
     check("action tools offered with --allow-actions", "create_ticket" in out["tools_offered"])

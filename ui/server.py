@@ -18,6 +18,10 @@ Routes:
                                 Server-Sent Events: Claude picks MCP tools (agent.mcp_agent),
                                 one event per tool call with its reason, then checked findings
   GET  /api/action_log?n=100    tail of the action log (accepts + refusals)
+  GET  /api/services?org=       every service (name, tier)
+  GET  /api/live?org=           live changes currently applied (agent.live)
+  POST /api/live                {op: expose|adopt, service, cve?, org?} mutate the live graph
+  POST /api/live_revert         {org?} remove every live change
 """
 from __future__ import annotations
 
@@ -34,6 +38,7 @@ from urllib.parse import urlparse, parse_qs
 from agent.triage import triage
 from agent.compare import compare_fixes
 from agent.act import act
+from agent import live
 from mcp_server import graph
 from mcp_server.server import create_ticket
 from mcp_server.actions import action_log_path
@@ -125,6 +130,10 @@ class Handler(BaseHTTPRequestHandler):
                     "slack_live": bool(os.getenv("SLACK_WEBHOOK"))})
             if url.path == "/api/investigate":
                 return self._investigate(qs)
+            if url.path == "/api/services":
+                return _json(self, {"services": live.services(qs.get("org", ["dev"])[0])})
+            if url.path == "/api/live":
+                return _json(self, {"changes": live.list_changes(qs.get("org", ["dev"])[0])})
             if url.path == "/api/action_log":
                 return _json(self, {"entries": self._log_tail(int(qs.get("n", ["100"])[0]))})
             return _json(self, {"error": f"unknown route {url.path}"}, 404)
@@ -149,6 +158,15 @@ class Handler(BaseHTTPRequestHandler):
             if url.path == "/api/refusal_drill":
                 return _json(self, self._refusal_drill(
                     body["cve"], body.get("org", "dev")))
+            if url.path == "/api/live":
+                org, op = body.get("org", "dev"), body["op"]
+                if op == "expose":
+                    return _json(self, live.expose(body["service"], org))
+                if op == "adopt":
+                    return _json(self, live.adopt(body["service"], body["cve"], org))
+                raise ValueError(f"unknown live op {op!r} (expose|adopt)")
+            if url.path == "/api/live_revert":
+                return _json(self, live.revert(body.get("org", "dev")))
             return _json(self, {"error": f"unknown route {url.path}"}, 404)
         except KeyError as e:
             return _json(self, {"error": f"missing parameter {e}"}, 400)

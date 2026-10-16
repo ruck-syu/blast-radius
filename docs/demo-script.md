@@ -1,24 +1,38 @@
-# Demo script (~5 min screen recording)
+# Demo script (~6 min screen recording)
 
 Prereqs: `docker compose up -d`, data loaded (see README Setup),
-`python -m ui.server` running on :8765. Use CVE-2021-44228, dev org.
+`ANTHROPIC_API_KEY` in `.env` (for step 3), `python -m agent.reset_demo`
+(clean Decisions, live changes, log), then `python -m ui.server` on :8765.
+Use CVE-2021-44228, dev org.
 
-1. **Ranked triage (0:00).** Enter the CVE, Triage. Narrate: 15 raw matches
-   narrow to 6 reachable critical services, each with its graph path. Click
-   the top row; scroll the SVG proof path (Service → USES → DEPENDS_ON* →
-   vulnerable package), point at the verified badge, rules, and owner.
-2. **Simulation (1:30).** Simulate fixes. Narrate the three before/after bars
-   and the recommendation (largest risk reduction), with numbers.
-3. **Actions with proof (2:30).** Ticket + notify ACT_NOW. Show accepted
-   entries with decision IDs in the action log.
-4. **Guardrail refusal (3:15).** Guardrail drill: forged proof comes back
-   refused with the reason; show it red in the log. "No path, no action."
-5. **Live change, no retraining (4:00).** In a terminal:
-   `python -m mcp_server.server` … simpler: run
-   `python -c "from mcp_server.server import apply_change; print(apply_change('add_endpoint', 'dev', path='/api/d/v1/demo', public=True, service='<an-unreachable-affected-service>'))"`
-   then re-triage in the UI and show the newly reachable service. Delete the
-   endpoint afterward (see `mcp_server/test_apply.py` revert pattern).
-6. **Verdicts + rules (4:40).** Scroll two results: an ACT_NOW (KEV +
-   public reach) and a SCHEDULE (KEV but no public path) with fired rules.
-7. **Close (5:00).** Action log + decisions; note every entry links a
-   Decision node (ABOUT CVE/service, FIRED rules) in FalkorDB.
+1. **Blast radius (0:00).** Triage loads on open. Narrate the tiles: 15
+   affected services through transitive dependencies, 7 reachable from the
+   internet, 6 ACT_NOW. On the blast map, hover a red service: its public
+   endpoint, every dependency hop down to log4j-core, and the CVE light up.
+2. **Why, with proof (0:45).** Click the top ranked row. Read the attack
+   chain: public route (endpoint → CALLS → service) and dependency chain
+   (service → USES → DEPENDS_ON* → log4j-core → CVE), both *verified* edge by
+   edge against FalkorDB. Point at risk = severity × exposure × criticality,
+   the fired rules, and the owner.
+3. **Claude investigates over MCP (1:30).** Ask "How does public traffic
+   reach d-checkout-api, and who should fix it?" or leave it blank for a full
+   triage. Each tool Claude picks streams in with its reason and what came
+   back. The findings table shows whether each verdict matches the rules and
+   each proof verified. Approve: tickets + notifications for those only.
+4. **Live change, no retraining (2:45).** Live change card: *Expose to the
+   internet* a critical SCHEDULE service, Apply. ~250 ms later it is ACT_NOW
+   with a verified route through the new `/live/...` endpoint, tagged
+   "was SCHEDULE" and highlighted on the map. *Adopt the vulnerable package*
+   on an unaffected service: it joins the blast radius. Revert live changes.
+5. **Simulation (3:45).** Simulate fixes. Each upgrade runs in a sandbox copy
+   of the graph; narrate the before/after bars and the recommendation (largest
+   org-wide risk reduction), with numbers.
+6. **Guardrail refusal (4:30).** Ticket + notify ACT_NOW, then the guardrail
+   drill: a forged proof comes back refused with the missing edge named. "No
+   path, no action."
+7. **Close (5:15).** Decisions recorded in the graph (ABOUT CVE/service,
+   FIRED rules) and the action log with accepts and the refusal.
+
+No key? Skip step 3; the header badge shows "Claude: no API key" and every
+other step runs without it. `python -m agent.mcp_agent CVE-2021-44228` shows
+the same trace in a terminal.

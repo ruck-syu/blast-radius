@@ -1,7 +1,8 @@
 /* Blast Radius UI: blast map, ranked list, attack chains, Claude investigation,
    simulation, actions, decisions, log. No deps. */
 const $ = (id) => document.getElementById(id);
-const state = { triage: null, selected: 0, compare: null, config: {}, findings: null };
+const state = { triage: null, selected: 0, compare: null, config: {}, findings: null,
+  services: [], changed: null };
 const cve = () => $("cve").value.trim();
 const org = () => $("org").value;
 
@@ -150,7 +151,8 @@ function renderRanked() {
     `<span class="mono">${r.risk.toFixed(1)}</span>` +
     `<span class="riskbar"><i style="width:${(100 * r.risk / max).toFixed(0)}%"></i></span>` +
     `<span class="svcname">${esc(r.service)}</span>` +
-    `<span class="tags">${r.reachable ? `<span class="tag pub" title="reachable from a public endpoint">public</span>` : ""}` +
+    `<span class="tags">${state.changed && state.changed[r.service] ? `<span class="tag chg">${esc(state.changed[r.service])}</span>` : ""}` +
+    `${r.reachable ? `<span class="tag pub" title="reachable from a public endpoint">public</span>` : ""}` +
     `<span class="tag">${esc(r.tier)}</span></span></div>`).join("");
   el.querySelectorAll(".row").forEach((d) => {
     d.addEventListener("click", () => select(+d.dataset.i));
@@ -245,6 +247,70 @@ function investigate() {
   es.onerror = () => { if (es) { $("findings").innerHTML ||= `<div class="refuse">stream closed</div>`; done(); } };
 }
 
+/* ---------- live change: mutate the graph, re-triage, diff ---------- */
+function fillLiveSvc() {
+  const t = state.triage, sel = $("liveSvc"), op = $("liveOp").value;
+  const tierRank = { critical: 0, standard: 1, internal: 2 };
+  let opts = [];
+  if (t && t.known_cve) {
+    const affected = new Set(t.results.map((r) => r.service));
+    opts = op === "expose"
+      ? t.results.filter((r) => !r.reachable).map((r) => ({ name: r.service, tier: r.tier, note: r.verdict }))
+      : state.services.filter((s) => !affected.has(s.name)).map((s) => ({ ...s, note: "not affected" }));
+    opts.sort((a, b) => tierRank[a.tier] - tierRank[b.tier] || a.name.localeCompare(b.name));
+  }
+  sel.innerHTML = opts.length ? opts.map((o) => `<option value="${esc(o.name)}">${esc(o.name)} · ${esc(o.tier)} · ${esc(o.note)}</option>`).join("")
+    : `<option value="">${op === "expose" ? "every affected service is already reachable" : "no unaffected services"}</option>`;
+  $("liveBtn").disabled = !opts.length;
+}
+
+async function refreshLive() {
+  try {
+    const { changes } = await api(`/api/live?org=${org()}`);
+    $("liveChanges").innerHTML = changes.length
+      ? `<p class="kv">live changes in this graph: ` + changes.map((c) =>
+          c.kind === "expose" ? `<b>${esc(c.what)}</b> → ${esc(c.service)}` : `<b>${esc(c.service)}</b> uses ${esc(c.what.split("/").pop())}`).join(" · ") + `</p>`
+      : "";
+    $("revertBtn").disabled = !changes.length;
+  } catch (e) { $("liveChanges").innerHTML = `<p class="hint">${esc(e.message)}</p>`; }
+}
+
+function diffTriage(before, after, what) {
+  if (!before || !before.known_cve || !after.known_cve) { $("liveDiff").innerHTML = `<div class="diff">${esc(what)}</div>`; return; }
+  const b = new Map(before.results.map((r) => [r.service, r])), a = new Map(after.results.map((r) => [r.service, r]));
+  const lines = [], changed = {};
+  const pill = (v) => `<span class="pill ${v}">${v}</span>`;
+  a.forEach((r, svc) => {
+    const o = b.get(svc);
+    if (!o) { changed[svc] = "new"; lines.push(`<b>${esc(svc)}</b> joined the blast radius ${pill(r.verdict)} <span class="kv">${esc(r.proof.detail)}</span>`); return; }
+    const parts = [];
+    if (o.verdict !== r.verdict) { parts.push(`${pill(o.verdict)} → ${pill(r.verdict)}`); changed[svc] = `was ${o.verdict}`; }
+    if (o.reachable !== r.reachable) parts.push(r.reachable
+      ? `now reachable via <span class="mono">${esc(r.exposure.path.nodes[0].properties.path)}</span> ${r.exposure.verified ? `<span class="okmark">route verified ✓</span>` : ""}`
+      : "no longer reachable");
+    if (parts.length) { changed[svc] ||= "changed"; lines.push(`<b>${esc(svc)}</b> ${parts.join(" · ")}`); }
+  });
+  b.forEach((o, svc) => { if (!a.has(svc)) lines.push(`<b>${esc(svc)}</b> left the blast radius`); });
+  state.changed = changed;
+  const n = (t, v) => t.results.filter((r) => r.verdict === v).length;
+  $("liveDiff").innerHTML = `<div class="diff"><b>${esc(what)}</b> <span class="kv">re-triaged in ${after.total_latency_ms}ms · ` +
+    `affected ${before.results.length} → ${after.results.length} · ACT_NOW ${n(before, "ACT_NOW")} → ${n(after, "ACT_NOW")}</span>` +
+    (lines.length ? lines.map((l) => `<div>${l}</div>`).join("") : `<div class="kv">no verdict changed</div>`) + `</div>`;
+  const first = after.results.findIndex((r) => changed[r.service]);
+  if (first >= 0) select(first);
+}
+
+async function liveChange(req, label) {
+  const before = state.triage;
+  $("liveBtn").disabled = $("revertBtn").disabled = true;
+  try {
+    const out = await post(req.path, req.body);
+    await runTriage(true);
+    diffTriage(before, state.triage, label(out));
+  } catch (e) { $("liveDiff").innerHTML = `<div class="refuse">${esc(e.message)}</div>`; }
+  refreshLive(); fillLiveSvc();
+}
+
 /* ---------- simulation, actions, decisions, log ---------- */
 function renderSim() {
   const c = state.compare, el = $("sim");
@@ -301,11 +367,13 @@ async function loadCves() {
   } catch (e) { /* free text still works */ }
 }
 
-async function runTriage() {
+async function runTriage(keepDiff = false) {
   $("status").textContent = "triaging…";
   try {
     state.triage = await api(`/api/triage?cve=${encodeURIComponent(cve())}&org=${org()}`);
     state.selected = 0; state.compare = null;
+    if (!keepDiff) { state.changed = null; $("liveDiff").innerHTML = ""; }
+    fillLiveSvc();
     renderSummary(); renderMap(); renderRanked(); renderDetail(); renderSim();
     for (const b of ["simBtn", "actBtn", "drillBtn"]) $(b).disabled = !state.triage.known_cve;
     $("acted").innerHTML = ""; $("refusal").innerHTML = "";
@@ -314,9 +382,21 @@ async function runTriage() {
   } catch (e) { $("status").textContent = `error: ${e.message}`; }
 }
 
-$("triageBtn").addEventListener("click", runTriage);
+async function loadServices() {
+  try { state.services = (await api(`/api/services?org=${org()}`)).services; } catch (e) { state.services = []; }
+  fillLiveSvc(); refreshLive();
+}
+
+$("triageBtn").addEventListener("click", () => runTriage());
 $("cve").addEventListener("keydown", (e) => { if (e.key === "Enter") runTriage(); });
-$("org").addEventListener("change", () => { loadCves(); runTriage(); });
+$("org").addEventListener("change", () => { loadCves(); loadServices(); runTriage(); });
+$("liveOp").addEventListener("change", fillLiveSvc);
+$("liveBtn").addEventListener("click", () => liveChange(
+  { path: "/api/live", body: { op: $("liveOp").value, service: $("liveSvc").value, cve: cve(), org: org() } },
+  (out) => out.summary));
+$("revertBtn").addEventListener("click", () => liveChange(
+  { path: "/api/live_revert", body: { org: org() } },
+  (out) => `reverted ${out.endpoints} endpoint(s), ${out.dependencies} dependency edge(s)`));
 $("askBtn").addEventListener("click", investigate);
 $("question").addEventListener("keydown", (e) => { if (e.key === "Enter") investigate(); });
 
@@ -356,5 +436,6 @@ window.addEventListener("resize", () => { if (state.triage) renderMap(); });
     }
   } catch (e) { /* non-fatal */ }
   loadCves();
+  loadServices();
   runTriage();
 })();

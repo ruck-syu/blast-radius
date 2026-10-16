@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import threading
+import urllib.error
 import urllib.request
 from http.server import ThreadingHTTPServer
 from urllib.parse import quote
@@ -96,6 +97,36 @@ def main() -> None:
             log = get("/api/action_log?n=50")["entries"]
             check("log isolated to temp file", log_path.exists()
                   and len(log) == len(log_path.read_text().strip().splitlines()))
+
+        # live change: expose an unreachable service, adopt the vuln in a clean one
+        post("/api/live_revert", {"org": "dev"})
+        by = {r["service"]: r for r in t["results"]}
+        hidden = next(r["service"] for r in t["results"]
+                      if not r["reachable"] and r["tier"] == "critical")
+        clean = next(s["name"] for s in get("/api/services?org=dev")["services"]
+                     if s["name"] not in by)
+        try:
+            post("/api/live", {"op": "expose", "service": hidden, "org": "dev"})
+            post("/api/live", {"op": "adopt", "service": clean, "cve": CVE, "org": "dev"})
+            check("live changes listed",
+                  {c["kind"] for c in get("/api/live?org=dev")["changes"]} == {"expose", "adopt"})
+            t2 = {r["service"]: r for r in
+                  get(f"/api/triage?cve={CVE}&org=dev")["results"]}
+            check("exposed service flips to ACT_NOW with a verified route",
+                  by[hidden]["verdict"] == "SCHEDULE" and t2[hidden]["verdict"] == "ACT_NOW"
+                  and t2[hidden]["exposure"]["verified"], hidden)
+            check("adopting service joins the blast radius",
+                  clean in t2 and t2[clean]["proof"]["verified"], clean)
+            try:
+                post("/api/live", {"op": "expose", "service": hidden, "org": "dev"})
+                check("duplicate live change rejected", False)
+            except urllib.error.HTTPError as e:
+                check("duplicate live change rejected", e.code == 400)
+        finally:
+            r = post("/api/live_revert", {"org": "dev"})
+        check("live changes reverted", r == {"org": "dev", "endpoints": 1, "dependencies": 1}
+              and {x["service"] for x in get(f"/api/triage?cve={CVE}&org=dev")["results"]}
+              == set(by))
     finally:
         server.AGENT_LLM = None
         srv.shutdown()

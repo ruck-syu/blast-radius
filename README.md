@@ -40,6 +40,7 @@ python -m agent.test_simulation      # Phase 4: fix comparison
 python -m agent.test_actions         # Phase 5: guardrail accept/refuse, sandbox-checked fix PRs
 python -m mcp_server.test_apply      # incremental updates + revert
 python -m agent.test_mcp_agent       # MCP agent: tool discovery, trace, verdict/proof checks (scripted LLM, no key)
+python -m ingest.test_osv            # OSV import: version ranges, CVSS, triage on an imported CVE (saved records, no network)
 python -m agent.test_gate            # pre-merge gate: sandbox assess, transitive pulls, upgrades, SBOM diff, live graph untouched
 python -m ui.test_ui                 # UI API: triage, SSE investigate, approve, refusal drill, live change
 python -m benchmark.runner --org all # Phase 7: 3 systems, held-out numbers
@@ -68,6 +69,8 @@ python -m agent.mcp_agent CVE-2021-44228 [--org heldout] [--allow-actions]  # Cl
 python -m agent.mcp_agent CVE-2021-44228 --offline     # no key: fixed tool sequence, same MCP loop and checks
 python -m agent.mcp_agent --question "Is d-checkout-api exposed to CVE-2021-44228, and how does public traffic reach it?"
 python -m agent.live expose d-notify-svc | adopt d-search-api --cve CVE-2021-44228 | list | revert
+python -m ingest.osv CVE-2021-45046 [--org heldout] [--dry-run]   # import a real advisory from OSV.dev
+python -m ingest.osv --scan --dry-run   # every OSV advisory for the graph's real packages
 python -m mcp_server.server   # MCP stdio transport for external clients
 ```
 
@@ -110,6 +113,8 @@ vulnerable package → CVE.
   pre-merge gate does; *Apply* changes the live graph through `apply_change`,
   re-triages and shows what flipped (e.g. SCHEDULE → ACT_NOW with the new
   route verified). Revert removes exactly those changes (provenance-tagged).
+- **Import from OSV.dev**: triage a CVE that isn't in the graph and the summary
+  offers to import it (`ingest.osv`); it is triaged as soon as it lands.
 - **Fix simulation**, **Actions** (ticket + notify, guardrail drill with a
   forged proof), **Decisions** recorded in the graph, and the **Action log**.
 
@@ -117,7 +122,7 @@ API (documented in the `ui/server.py` docstring): `GET /api/triage`,
 `/api/compare`, `/api/cves`, `/api/config`, `/api/decisions`,
 `/api/action_log`, `/api/services`, `/api/live`, `/api/investigate` (SSE);
 `POST /api/act`, `/api/refusal_drill`, `/api/live`, `/api/live_revert`,
-`/api/assess`.
+`/api/assess`, `/api/import_cve`.
 
 Tools (all parameterized Cypher from `queries/`, see below):
 `get_cve`, `find_affected_services`, `check_reachability`, `dependency_path`,
@@ -129,14 +134,18 @@ Every action tool refuses without a proof path whose every edge exists in the
 graph. `open_fix_pr` adds a second check: the upgrade is applied to a sandbox
 copy first, and the PR is refused unless it resolves that CVE for that service
 without opening new ACT_NOW exposure (pinning `xz@5.6.1` as a "fix" for log4j is
-refused with CVE-2024-3094 named). The sandbox result goes in the PR body.
+refused with CVE-2024-3094 named). The sandbox result goes in the PR body,
+with a warning when the target version still carries other CVEs (with
+CVE-2018-11776 imported from OSV, upgrading struts to 2.5.10.1 fixes
+CVE-2017-5638 but stays ACT_NOW for the KEV-listed CVE-2018-11776; the gate
+lists it under "Still exposed through the added packages").
 
 ## Where it fits in the workflow
 
 | When | Entry point | What happens |
 |------|-------------|--------------|
 | A PR changes dependencies or routes | `python -m agent.gate` in CI (base vs PR CycloneDX SBOMs, or explicit purls) | the change is applied to a sandbox copy of the graph, every CVE re-scored; exit 1 with a markdown PR comment if it opens new ACT_NOW exposure (transitive pulls included); upgrades are credited with what they resolve |
-| A new CVE lands | `python -m agent.triage` / `agent.mcp_agent` / the UI | blast radius, public routes, verdicts, owners, each with a verified proof |
+| A new CVE lands | `python -m ingest.osv <id>` (or Import in the UI; `--scan` on a schedule), then `agent.triage` / `agent.mcp_agent` / the UI | the advisory's version ranges are matched against the graph's package versions; then blast radius, public routes, verdicts, owners, each with a verified proof |
 | Verdicts are in | `python -m agent.act`, or Approve in the UI | tickets + owner notifications, refused without a verified proof |
 | Choosing what to fix first | Simulate fixes / `simulate_fix` | each upgrade re-scored in a sandbox copy; biggest org-wide risk drop wins |
 | Ad-hoc questions | Claude Code (`.mcp.json` in this repo) or any MCP client | the same graph tools, the model picks which to call |
@@ -237,7 +246,9 @@ cites each affected service's rank), plus guardrail
 `write_decision`), simulation (`upgrade_path`, `upgrade_uses`,
 `upgrade_depends`, `remove_fixed_affects`), incremental updates (`apply_*`,
 `list_live_changes`, `revert_live_*`), pre-merge checks (`package_exists`, `service_resolves`,
-`dependency_path_avoiding`, `service_sbom`),
+`dependency_path_avoiding`, `service_sbom`), advisory import (`real_packages`,
+`packages_by_purl_prefix`, `cve_source`, `import_cve`, `import_fix_link`,
+`remove_imported_cve`, `prune_imported_upgrades`),
 and UI helpers (`get_cve`, `list_cves`, `list_services`, `list_decisions`,
 `call_graph_edges`).
 Depth bounds are literals injected after int validation — FalkorDB
@@ -267,6 +278,9 @@ All data is public or synthetic. Public: CVE/advisory metadata (IDs, CVSS,
 summaries) and real package names/versions for the three vulnerable/fixed
 pairs. Synthetic (labelled `synthetic:true`, fictional people/teams):
 services, endpoints, package dependency edges, teams, persons, deployments.
+`ingest.osv` imports public advisories from OSV.dev (CVSS from the v3 vector,
+KEV from the CISA catalog, EPSS from FIRST), tagged `source: 'osv'` and
+removed by `agent.reset_demo`; seeded CVEs are never overwritten.
 No private, login-protected, paywalled, or personal data. Two separate graphs
 (`blast_radius_dev`, seed 42; `blast_radius_heldout`, seed 1337) so held-out
 evaluation is genuinely unseen.

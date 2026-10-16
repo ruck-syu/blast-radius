@@ -30,7 +30,14 @@ function renderSummary() {
   const t = state.triage, el = $("summary");
   if (!t) { el.classList.add("hidden"); return; }
   el.classList.remove("hidden");
-  if (!t.known_cve) { el.innerHTML = `<b>${esc(t.summary)}</b>`; return; }
+  if (!t.known_cve) {
+    el.innerHTML = `<b>${esc(t.summary)}</b> <button id="importBtn" class="ghost">Import ${esc(cve())} from OSV.dev</button>` +
+      `<p class="kv">Fetches the advisory, checks its version ranges against every version of the package in the graph, ` +
+      `takes CVSS from the vector, KEV from CISA and EPSS from FIRST. Undo with <code>python -m agent.reset_demo</code>.</p>` +
+      (state.imported ? `<pre class="imported">${esc(state.imported)}</pre>` : "");
+    $("importBtn").addEventListener("click", importCve);
+    return;
+  }
   const c = t.cve, rs = t.results, n = (v) => rs.filter((r) => r.verdict === v).length;
   const tile = (k, v, cls = "") => `<div class="tile ${cls}"><b>${v}</b><span>${k}</span></div>`;
   el.innerHTML =
@@ -42,7 +49,22 @@ function renderSummary() {
     tile("SUPPRESS", n("SUPPRESS"), "t-supp") +
     tile("CVSS", c.cvss) + tile("EPSS", c.epss) + tile("CISA KEV", c.in_kev ? "yes" : "no", c.in_kev ? "t-act" : "") +
     `</div><p class="kv">${t.plan.length} graph tool calls · ${t.total_latency_ms}ms · ` +
-    `vulnerable ${esc(c.vuln_purl)} → fixed ${esc(c.fixed_purl)}</p>`;
+    `vulnerable ${esc(c.vuln_purl)} → fixed ${esc(c.fixed_purl)}</p>` +
+    (state.imported ? `<p class="kv">Imported from OSV.dev:</p><pre class="imported">${esc(state.imported)}</pre>` : "");
+}
+
+async function importCve() {
+  $("status").textContent = "importing from OSV.dev…";
+  $("importBtn").disabled = true;
+  try {
+    const p = await post("/api/import_cve", { id: cve(), org: org() });
+    state.imported = p.text;
+    if (p.imported) { $("cve").value = p.cve; await loadCves(); await runTriage(); }
+    else { $("status").textContent = ""; renderSummary(); }
+  } catch (e) {
+    $("status").textContent = `import error: ${e.message}`;
+    $("importBtn").disabled = false;
+  }
 }
 
 /* ---------- blast map: layered DAG of every proof + public route ---------- */
@@ -412,6 +434,7 @@ async function runTriage(keepDiff = false) {
   try {
     state.triage = await api(`/api/triage?cve=${encodeURIComponent(cve())}&org=${org()}`);
     state.selected = 0; state.compare = null;
+    if (state.imported && !state.imported.startsWith(state.triage.cve?.id ?? cve())) state.imported = null;
     if (!keepDiff) { state.changed = null; $("liveDiff").innerHTML = ""; }
     fillLiveSvc();
     renderSummary(); renderMap(); renderRanked(); renderDetail(); renderSim();

@@ -23,6 +23,7 @@ Routes:
   POST /api/live                {op: expose|adopt, service, cve?, org?} mutate the live graph
   POST /api/live_revert         {org?} remove every live change
   POST /api/assess              {service, adds?, expose?, org?} pre-merge check in a sandbox copy
+  POST /api/import_cve          {id, org?} fetch an advisory from OSV.dev into the graph (ingest.osv)
 """
 from __future__ import annotations
 
@@ -37,6 +38,7 @@ from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
 from agent.triage import triage
+from ingest import osv
 from agent.compare import compare_fixes
 from agent.act import act
 from agent import live
@@ -174,6 +176,15 @@ class Handler(BaseHTTPRequestHandler):
                                                  body.get("removes") or []))
             if url.path == "/api/live_revert":
                 return _json(self, live.revert(body.get("org", "dev")))
+            if url.path == "/api/import_cve":
+                org = body.get("org", "dev")
+                graph_name(org)
+                try:
+                    rec = osv.fetch_record(body["id"].strip())
+                except OSError as e:
+                    return _json(self, {"error": f"OSV.dev: {e}"}, 502)
+                p = osv.write(osv.plan(rec, org))
+                return _json(self, {**p, "text": osv.describe(p)})
             return _json(self, {"error": f"unknown route {url.path}"}, 404)
         except KeyError as e:
             return _json(self, {"error": f"missing parameter {e}"}, 400)

@@ -14,7 +14,9 @@ from mcp_server.server import create_ticket, notify_owner, open_fix_pr
 
 
 def act(cve: str, org: str = "dev", verdicts: tuple[str, ...] = ("ACT_NOW",),
-        with_pr: bool = False) -> dict:
+        with_pr: bool = False, services: list[str] | None = None) -> dict:
+    """Ticket + notify (+ fix PR) for each verified item whose verdict is in `verdicts`,
+    optionally limited to `services` (e.g. findings a reviewer approved in the UI)."""
     out = triage(cve, org, use_llm=False)
     if not out["known_cve"]:
         return {"cve": cve, "org": org, "known_cve": False,
@@ -22,6 +24,8 @@ def act(cve: str, org: str = "dev", verdicts: tuple[str, ...] = ("ACT_NOW",),
     actions, refusals = [], []
     for r in out["results"]:
         if r["verdict"] not in verdicts or not r["proof"]["verified"]:
+            continue
+        if services is not None and r["service"] not in services:
             continue
         proof, rules = r["proof"]["path"], r["rules_fired"]
         calls = [("ticket", create_ticket(cve, r["service"], r["verdict"],

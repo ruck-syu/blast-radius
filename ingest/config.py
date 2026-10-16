@@ -1,5 +1,27 @@
-"""Shared config: FalkorDB connection + graph names per org."""
+"""Shared config: FalkorDB connection + graph names per org.
+
+Loads <repo>/.env on import (stdlib, no python-dotenv); variables already set in
+the process environment win, so `FOO=x python -m ...` still overrides .env.
+"""
 import os
+from pathlib import Path
+
+
+def _load_dotenv(path: Path = Path(__file__).resolve().parent.parent / ".env") -> None:
+    if not path.is_file():
+        return
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.removeprefix("export ").strip()
+        value = value.split(" #", 1)[0].strip().strip("'\"")
+        if key and value:
+            os.environ.setdefault(key, value)
+
+
+_load_dotenv()
 
 HOST = os.getenv("FALKORDB_HOST", "localhost")
 PORT = int(os.getenv("FALKORDB_PORT", "6379"))

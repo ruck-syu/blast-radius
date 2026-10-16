@@ -8,30 +8,54 @@
 </head>
 <body>
 <header>
-  <h1>Blast Radius</h1>
-  <p class="sub">supply-chain triage over FalkorDB · Track 01</p>
+  <div class="brand">
+    <h1>Blast Radius</h1>
+    <p class="sub">supply-chain triage over FalkorDB · Track 01</p>
+  </div>
   <div class="controls">
-    <select id="org">
+    <select id="org" aria-label="organisation graph">
       <option value="dev">dev org</option>
       <option value="heldout">held-out org</option>
     </select>
-    <input id="cve" value="CVE-2021-44228" spellcheck="false" placeholder="CVE-XXXX-XXXXX">
+    <input id="cve" list="cveList" value="CVE-2021-44228" spellcheck="false"
+           placeholder="CVE-XXXX-XXXXX" aria-label="CVE id">
+    <datalist id="cveList"></datalist>
     <button id="triageBtn">Triage</button>
-    <span id="status"></span>
+    <span id="status" role="status"></span>
   </div>
+  <div id="wires" class="wires"></div>
 </header>
 <main>
   <section id="summary" class="card hidden"></section>
+
+  <section class="card">
+    <h2>Blast map <span class="kv">public endpoint → affected service → dependency chain → vulnerable package → CVE · hover a service to trace it, click to inspect</span></h2>
+    <div id="map"><p class="hint">Run triage to draw the blast radius.</p></div>
+  </section>
+
   <div class="cols">
     <section class="card">
       <h2>Ranked services</h2>
       <div id="ranked"><p class="hint">Run triage to populate.</p></div>
     </section>
     <section class="card">
-      <h2>Detail + proof path</h2>
+      <h2>Why: attack chain + proof</h2>
       <div id="detail"><p class="hint">Select a service.</p></div>
     </section>
   </div>
+
+  <section class="card" id="investigateCard">
+    <h2>Investigate with Claude <span class="kv">model picks graph tools over MCP; code re-checks every verdict and proof</span></h2>
+    <div class="controls">
+      <input id="question" class="grow" spellcheck="false"
+             placeholder="Ask about the graph, e.g. How does public traffic reach d-checkout-api, and who should fix it? (blank = full triage of the CVE)">
+      <button id="askBtn">Investigate</button>
+    </div>
+    <div id="agentNote" class="hint"></div>
+    <ul id="trace" class="trace"></ul>
+    <div id="findings"></div>
+  </section>
+
   <div class="cols">
     <section class="card">
       <h2>Fix simulation</h2>
@@ -42,14 +66,19 @@
       <h2>Actions</h2>
       <div class="controls">
         <button id="actBtn" disabled>Ticket + notify ACT_NOW</button>
-        <button id="drillBtn" disabled>Guardrail drill (forged proof)</button>
+        <button id="drillBtn" class="ghost" disabled>Guardrail drill (forged proof)</button>
       </div>
       <div id="acted"></div>
       <div id="refusal"></div>
+      <h3>Decisions recorded in the graph</h3>
+      <div id="decisions"><p class="hint">None for this CVE yet.</p></div>
     </section>
   </div>
+
   <section class="card">
-    <h2>Action log <button id="logBtn" class="small">refresh</button></h2>
+    <h2>Action log
+      <label class="kv small-label"><input type="checkbox" id="logThisCve" checked> this CVE only</label>
+      <button id="logBtn" class="small">refresh</button></h2>
     <div id="alog"><p class="hint">No entries yet.</p></div>
   </section>
 </main>

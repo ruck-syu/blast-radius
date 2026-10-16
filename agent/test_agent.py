@@ -36,6 +36,9 @@ def check_cve(cve_id: str, org: str, truth: dict):
     act_now = {r["service"] for r in out["results"] if r["verdict"] == "ACT_NOW"}
     check(f"{org} {cve_id} ACT_NOW == reachable", act_now == exp_reach,
           f"act_now={len(act_now)} reach={len(exp_reach)}")
+    check(f"{org} {cve_id} public routes verified for reachable, none otherwise",
+          all((r["exposure"] or {}).get("verified") if r["reachable"] else r["exposure"] is None
+              for r in out["results"]))
     risks = [r["risk"] for r in out["results"]]
     check(f"{org} {cve_id} ranked desc", all(a >= b for a, b in zip(risks, risks[1:])))
     check(f"{org} {cve_id} explanations+owners+rules",

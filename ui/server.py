@@ -9,17 +9,24 @@ Routes:
   GET  /                        index.html (+ /app.js, /style.css)
   GET  /api/triage?cve=&org=    ranked, explained triage with proof paths
   GET  /api/compare?cve=&org=   simulated fixes + recommendation
-  POST /api/act                 {cve, org?, verdicts?, with_pr?} proof-backed actions
+  POST /api/act                 {cve, org?, verdicts?, with_pr?, services?} proof-backed actions
   POST /api/refusal_drill       {cve, org?} deliberately tampered proof -> refusal
-  GET  /api/decisions           recent Decision nodes
-  GET  /api/action_log?n=100    tail of actions/log.jsonl (accepts + refusals)
+  GET  /api/decisions?org=      recent Decision nodes
+  GET  /api/cves?org=           CVEs in the org graph (id, cvss, KEV, summary)
+  GET  /api/config              which optional live wires are configured
+  GET  /api/investigate?question=&org=&cve=
+                                Server-Sent Events: Claude picks MCP tools (agent.mcp_agent),
+                                one event per tool call with its reason, then checked findings
+  GET  /api/action_log?n=100    tail of the action log (accepts + refusals)
 """
 from __future__ import annotations
 
 import argparse
+import asyncio
 import copy
 import json
 import logging
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
@@ -29,9 +36,20 @@ from agent.compare import compare_fixes
 from agent.act import act
 from mcp_server import graph
 from mcp_server.server import create_ticket
+from mcp_server.actions import action_log_path
+from mcp_server.server import get_cve
+from mcp_server.simulate import list_cves
+from ingest.config import graph_name
 
 UI_DIR = Path(__file__).resolve().parent
 log = logging.getLogger("blast-radius.ui")
+
+# Tests inject a scripted llm here; otherwise Investigate needs ANTHROPIC_API_KEY.
+AGENT_LLM = None
+
+
+def agent_available() -> bool:
+    return AGENT_LLM is not None or bool(os.getenv("ANTHROPIC_API_KEY"))
 
 
 def _json(handler: BaseHTTPRequestHandler, obj: object, status: int = 200) -> None:
@@ -93,6 +111,20 @@ class Handler(BaseHTTPRequestHandler):
                     {"id": r[0], "ts": r[1], "action": r[2], "verdict": r[3],
                      "target": r[4], "cve": r[5], "service": r[6], "rules": r[7]}
                     for r in rows]})
+            if url.path == "/api/cves":
+                org = qs.get("org", ["dev"])[0]
+                cves = [get_cve(c, org) for c in list_cves(graph_name(org))]
+                return _json(self, {"cves": [
+                    {"id": c["id"], "cvss": c["cvss"], "in_kev": c["in_kev"],
+                     "summary": c["summary"]} for c in cves if c["found"]]})
+            if url.path == "/api/config":
+                return _json(self, {
+                    "agent_llm": agent_available(),
+                    "model": os.getenv("LLM_MODEL", "claude-opus-5-5"),
+                    "github_live": bool(os.getenv("GITHUB_TOKEN") and os.getenv("DEMO_REPO")),
+                    "slack_live": bool(os.getenv("SLACK_WEBHOOK"))})
+            if url.path == "/api/investigate":
+                return self._investigate(qs)
             if url.path == "/api/action_log":
                 return _json(self, {"entries": self._log_tail(int(qs.get("n", ["100"])[0]))})
             return _json(self, {"error": f"unknown route {url.path}"}, 404)
@@ -112,7 +144,8 @@ class Handler(BaseHTTPRequestHandler):
                 return _json(self, act(
                     body["cve"], body.get("org", "dev"),
                     verdicts=tuple(body.get("verdicts", ["ACT_NOW"])),
-                    with_pr=bool(body.get("with_pr", False))))
+                    with_pr=bool(body.get("with_pr", False)),
+                    services=body.get("services")))
             if url.path == "/api/refusal_drill":
                 return _json(self, self._refusal_drill(
                     body["cve"], body.get("org", "dev")))
@@ -124,6 +157,46 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as e:
             log.exception("POST %s failed", self.path)
             return _json(self, {"error": f"{type(e).__name__}: {e}"}, 500)
+
+    def _investigate(self, qs: dict) -> None:
+        """Stream agent.mcp_agent events as SSE; the final event carries checked findings."""
+        org = qs.get("org", ["dev"])[0]
+        cve = (qs.get("cve", [""])[0] or "").strip() or None
+        question = (qs.get("question", [""])[0] or "").strip()
+        graph_name(org)  # ValueError -> 400 for unknown org
+        if not question:
+            if not cve:
+                raise ValueError("give a question or a cve")
+            question = (f"Triage {cve}: which services are affected, which are reachable "
+                        f"from a public endpoint, what verdict does each get, and who owns "
+                        f"the ones to act on now?")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+
+        def send(event: dict) -> None:
+            self.wfile.write(f"data: {json.dumps(event)}\n\n".encode())
+            self.wfile.flush()
+
+        if not agent_available():
+            send({"type": "error", "error": "ANTHROPIC_API_KEY is not set: add it to .env "
+                  "and restart the UI to let Claude investigate."})
+            return
+        from agent.mcp_agent import run_agent
+        try:
+            out = asyncio.run(run_agent(question, org, cve=cve, llm=AGENT_LLM, on_event=send))
+            send({"type": "done", **out})
+        except (BrokenPipeError, ConnectionResetError):
+            log.info("investigate client disconnected")
+        except BaseException as e:  # noqa: BLE001 - MCP task groups wrap the real error
+            while isinstance(e, BaseExceptionGroup):
+                e = e.exceptions[0]
+            log.exception("investigate failed")
+            try:
+                send({"type": "error", "error": f"{type(e).__name__}: {e}"})
+            except OSError:
+                pass
 
     @staticmethod
     def _refusal_drill(cve: str, org: str) -> dict:
@@ -143,7 +216,7 @@ class Handler(BaseHTTPRequestHandler):
 
     @staticmethod
     def _log_tail(n: int) -> list[dict]:
-        p = UI_DIR.parent / "actions" / "log.jsonl"
+        p = action_log_path()
         if not p.exists():
             return []
         lines = p.read_text().strip().split("\n")

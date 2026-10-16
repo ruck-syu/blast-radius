@@ -12,6 +12,7 @@ from pathlib import Path
 from mcp_server import graph
 from mcp_server.server import score_risk, create_ticket, notify_owner
 from agent.act import act
+from agent.testkit import isolated_actions
 
 ROOT = Path(__file__).resolve().parent.parent
 fails: list[str] = []
@@ -29,6 +30,13 @@ def decision_links(org: str, did: str):
 
 
 def main() -> None:
+    with isolated_actions() as log_path:
+        run(log_path)
+    print("ALL PASS" if not fails else f"{len(fails)} FAILURES: {fails}")
+    raise SystemExit(1 if fails else 0)
+
+
+def run(log_path: Path) -> None:
     org, cve = "dev", "CVE-2021-44228"
     item = score_risk(cve, org)["ranked"][0]
     svc, proof = item["service"], item["path"]
@@ -82,14 +90,11 @@ def main() -> None:
     check("agent zero refusals", out["refusals"] == [])
 
     # 8. action log has accepts + refusals
-    log_lines = (ROOT / "actions" / "log.jsonl").read_text().strip().split("\n")
+    log_lines = log_path.read_text().strip().split("\n")
     entries = [json.loads(line) for line in log_lines]
     check("action log accepts+refusals",
           any(e["accepted"] for e in entries) and any(not e["accepted"] for e in entries),
           f"{len(entries)} entries")
-
-    print("ALL PASS" if not fails else f"{len(fails)} FAILURES: {fails}")
-    raise SystemExit(1 if fails else 0)
 
 
 if __name__ == "__main__":

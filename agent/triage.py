@@ -4,7 +4,8 @@ Plan (deterministic; LLM used only for the final summary wording):
   1. get_cve      - CVE metadata + vulnerable/fixed purls (unknown-CVE guard)
   2. score_risk   - ranked affected services with risk components + paths
   3. per service: evaluate_rules + find_owner
-  4. verify each proof path (chain integrity + endpoints match CVE/service)
+  4. verify each proof path (chain integrity + endpoints match CVE/service); for
+     reachable services also fetch + verify the shortest public route (check_reachability)
   5. verdict per item from fired rules; template explanation (LLM override if configured)
 
 The agent never writes free-form Cypher: every traversal is a parameterized
@@ -26,6 +27,7 @@ from mcp_server.server import (
     find_affected_services, check_reachability, dependency_path,
     rank_criticality, find_owner, score_risk, evaluate_rules,
 )
+from mcp_server.actions import verify_exposure_path
 from . import llm
 
 log = logging.getLogger("blast-radius.agent")
@@ -92,8 +94,18 @@ def triage(cve_id: str, org: str = "dev", use_llm: bool = True) -> dict:
         owner = step("find_owner", find_owner(svc, org))
         fired = rules["fired"]
         ok, reason = verify_proof(item["path"], svc, meta["vuln_purl"])
+        exposure = None
+        if item["reachable"]:
+            entries = step("check_reachability", check_reachability(svc, org))["entries"]
+            route = min(entries, key=lambda e: e["path"]["length"])["path"] if entries else None
+            e_ok, e_detail = verify_exposure_path(org, route, svc)
+            exposure = {"path": route, "verified": e_ok, "detail": e_detail}
         verdict, why = verdict_for(fired)
         entry = f"reachable from public {item['entry_point']}" if item["reachable"] else "no public path"
+        if exposure and exposure["path"]:
+            hops = [n["properties"].get("path") or n["properties"].get("name")
+                    for n in exposure["path"]["nodes"]]
+            entry = f"reachable via {' -> '.join(hops)}"
         explanation = (
             f"{svc} ({item['tier']}) is {item['depth']} hops from {meta['vuln_purl']} "
             f"({entry}); risk {item['risk']:.1f} = {item['severity']:.2f}x"
@@ -112,6 +124,7 @@ def triage(cve_id: str, org: str = "dev", use_llm: bool = True) -> dict:
                       "last_deployer": owner.get("last_deployer"),
                       "deployed_at": owner.get("deployed_at")},
             "proof": {"path": item["path"], "verified": ok, "detail": reason},
+            "exposure": exposure,
             "explanation": explanation,
         })
 

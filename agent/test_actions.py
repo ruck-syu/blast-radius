@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 
 from mcp_server import graph
-from mcp_server.server import score_risk, create_ticket, notify_owner
+from mcp_server.server import score_risk, create_ticket, notify_owner, open_fix_pr
 from agent.act import act
 from agent.testkit import isolated_actions
 
@@ -89,7 +89,20 @@ def run(log_path: Path) -> None:
           f"{kinds}, {out['summary']}")
     check("agent zero refusals", out["refusals"] == [])
 
-    # 8. action log has accepts + refusals
+    # 8. fix PR: the upgrade is verified in a sandbox before the PR is proposed
+    r = open_fix_pr(cve, svc, "ACT_NOW", "acceptance test", proof, "", ["R_KEV"], org)
+    fc = r.get("fix_check", {})
+    check("fix PR accepted after sandbox check",
+          r["accepted"] and any(x.startswith(f"{cve} on {svc}") for x in fc.get("resolves", []))
+          and not fc.get("new_exposure") and "Sandbox check" in r["target"], r.get("reason", ""))
+    r = open_fix_pr(cve, svc, "ACT_NOW", "x", proof, "pkg:conan/xz@5.6.1", [], org)
+    check("fix that opens new ACT_NOW exposure refused",
+          not r["accepted"] and "new ACT_NOW exposure" in r["reason"], r["reason"][:120])
+    r = open_fix_pr(cve, svc, "ACT_NOW", "x", forged, "", [], org)
+    check("fix PR with forged proof refused before any sandbox work",
+          not r["accepted"] and "not in graph" in r["reason"] and "fix_check" not in r)
+
+    # 9. action log has accepts + refusals
     log_lines = log_path.read_text().strip().split("\n")
     entries = [json.loads(line) for line in log_lines]
     check("action log accepts+refusals",

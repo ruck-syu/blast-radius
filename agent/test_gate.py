@@ -88,6 +88,13 @@ def main() -> None:
           and {"cve": CVE, "service": top, "before": "ACT_NOW", "after": None} in r["resolved"],
           top)
     check("resolved listed in the report", "Resolved by this change" in markdown(r))
+    # removing one CVE's package must not hide another CVE on the same service
+    xz = get_cve("CVE-2024-3094", ORG)["vuln_purl"]
+    r = gate(top, [xz], org=ORG, removes=[meta["vuln_purl"]])
+    check("removal resolves only the CVE whose package is gone",
+          any(x["service"] == top and x["cve"] == CVE for x in r["resolved"])
+          and any(x["service"] == top and x["cve"] == "CVE-2024-3094" for x in r["findings"]),
+          f"resolved {[x['cve'] for x in r['resolved']]}, new {[x['cve'] for x in r['findings']]}")
     r = gate(top, [], org=ORG, removes=["pkg:npm/not-a-dep@1.0.0"])
     check("removing a package the service never resolved changes nothing",
           r["not_used"] == ["pkg:npm/not-a-dep@1.0.0"] and not r["resolved"] and not r["findings"])

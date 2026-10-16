@@ -36,7 +36,7 @@ Verify each phase (all must print ALL PASS / ACCEPTANCE PASS):
 python -m mcp_server.test_tools      # Phase 2: read tools vs ground truth
 python -m agent.test_agent           # Phase 3: end-to-end triage
 python -m agent.test_simulation      # Phase 4: fix comparison
-python -m agent.test_actions         # Phase 5: guardrail accept/refuse
+python -m agent.test_actions         # Phase 5: guardrail accept/refuse, sandbox-checked fix PRs
 python -m mcp_server.test_apply      # incremental updates + revert
 python -m agent.test_mcp_agent       # MCP agent: tool discovery, trace, verdict/proof checks (scripted LLM, no key)
 python -m agent.test_gate            # pre-merge gate: sandbox assess, transitive pulls, upgrades, SBOM diff, live graph untouched
@@ -115,6 +115,12 @@ Tools (all parameterized Cypher from `queries/`, see below):
 `rank_criticality`, `find_owner`, `score_risk`, `evaluate_rules`,
 `simulate_fix`, `assess_change`, `apply_change`, `create_ticket`, `notify_owner`,
 `open_fix_pr`.
+
+Every action tool refuses without a proof path whose every edge exists in the
+graph. `open_fix_pr` adds a second check: the upgrade is applied to a sandbox
+copy first, and the PR is refused unless it resolves that CVE for that service
+without opening new ACT_NOW exposure (pinning `xz@5.6.1` as a "fix" for log4j is
+refused with CVE-2024-3094 named). The sandbox result goes in the PR body.
 
 ## Where it fits in the workflow
 

@@ -130,8 +130,10 @@ def _slack_notify(text: str, channel: str) -> tuple[str, str]:
 
 def _act(org: str, action: str, cve: str, service: str, verdict: str,
          rationale: str, proof_path: dict | None, rules: list[str],
-         deliver) -> dict:
-    """Shared guardrail + Decision + delivery wrapper. Returns accept/refuse."""
+         deliver, precheck=None) -> dict:
+    """Shared guardrail + Decision + delivery wrapper. Returns accept/refuse.
+    `precheck` (after the proof check) returns (ok, reason, extra fields) and can
+    refuse the action; `deliver` then receives the extra fields."""
     t0 = time.time()
     ok, reason, ids = verify_proof_path(org, proof_path, service,
                                         cve if action in ("ticket", "fix_pr") else None)
@@ -142,8 +144,16 @@ def _act(org: str, action: str, cve: str, service: str, verdict: str,
         _append_log({**base, "accepted": False, "reason": reason})
         return {"accepted": False, "reason": reason,
                 "latency_ms": round((time.time() - t0) * 1000, 1)}
+    extra = {}
+    if precheck:
+        ok, reason, extra = precheck()
+        if not ok:
+            log.warning("refusal action=%s cve=%s service=%s: %s", action, cve, service, reason)
+            _append_log({**base, "accepted": False, "reason": reason})
+            return {"accepted": False, "reason": reason, **extra,
+                    "latency_ms": round((time.time() - t0) * 1000, 1)}
     try:
-        mode, target = deliver()
+        mode, target = deliver(**extra)
     except Exception as e:
         reason = f"delivery failed: {e}"
         log.warning("action=%s cve=%s service=%s: %s", action, cve, service, reason)
@@ -155,7 +165,7 @@ def _act(org: str, action: str, cve: str, service: str, verdict: str,
                  "decision_id": did, "verdict": verdict})
     log.info("action=%s decision=%s mode=%s", action, did, mode)
     return {"accepted": True, "mode": mode, "target": target, "decision_id": did,
-            "proof_ids": ids, "latency_ms": round((time.time() - t0) * 1000, 1)}
+            "proof_ids": ids, **extra, "latency_ms": round((time.time() - t0) * 1000, 1)}
 
 
 def create_ticket(cve: str, service: str, verdict: str, rationale: str,
@@ -185,11 +195,45 @@ def open_fix_pr(cve: str, service: str, verdict: str, rationale: str,
                 rules: list[str] | None = None, org: str = "dev") -> dict:
     """Propose a fix PR on our demo repo (dry-run until a demo checkout exists).
 
-    Live PR creation needs a demo-repo checkout to branch from; until Phase 8
-    provides one, the fix payload (upgrade + proof) is logged and a Decision
-    node is still written. Never touches third-party repositories.
+    Second guardrail after the proof check: the upgrade (service pins `fix`, or
+    the CVE's fixed version, and stops resolving the vulnerable one) is applied
+    to a sandbox graph copy first. Refused unless it resolves this CVE for this
+    service and opens no new ACT_NOW exposure; the sandbox result goes in the PR.
+
+    Live PR creation needs a demo-repo checkout to branch from, so the fix
+    payload (upgrade + proof + sandbox check) is logged and a Decision node is
+    still written. Never touches third-party repositories.
     """
-    payload = (f"FIX PR draft: upgrade {fix or 'vulnerable package'} "
-               f"for {cve} affecting {service}. {rationale}")
+    def precheck():
+        rows, _ = graph.run(org, "get_cve", {"cve": cve})
+        vuln = rows[0][5] if rows else None
+        fixed = fix if fix.startswith("pkg:") else (rows[0][6] if rows else None)
+        if not vuln or not fixed or fixed == vuln:
+            return False, f"refused: no fixed version of {cve} in the graph to verify", {}
+        from .assess import assess_change
+        r = assess_change(service, [fixed], "", org, [vuln])
+        check = {"upgrade": {"from": vuln, "to": fixed}, "unknown": r["unknown_packages"],
+                 "resolves": [f"{x['cve']} on {x['service']} (was {x['before']})"
+                              for x in r["resolved"]],
+                 "new_exposure": [f"{x['cve']} on {x['service']} -> {x['after']}"
+                                  for x in r["findings"]],
+                 "latency_ms": r["latency_ms"]}
+        if not any(x["cve"] == cve and x["service"] == service and x["after"] is None
+                   for x in r["resolved"]):
+            return False, (f"refused: sandbox upgrade to {fixed} does not resolve {cve} "
+                           f"for {service}"), {"fix_check": check}
+        if r["worst"] == "ACT_NOW":
+            return False, (f"refused: sandbox upgrade to {fixed} opens new ACT_NOW exposure: "
+                           + "; ".join(check["new_exposure"])), {"fix_check": check}
+        return True, "", {"fix_check": check}
+
+    def deliver(fix_check):
+        u = fix_check["upgrade"]
+        payload = (f"FIX PR draft for {service}: {u['from']} -> {u['to']} ({cve}). "
+                   f"Sandbox check ({fix_check['latency_ms']:.0f} ms): resolves "
+                   f"{'; '.join(fix_check['resolves'])}; new exposure: "
+                   f"{'; '.join(fix_check['new_exposure']) or 'none'}. {rationale}")
+        return "dry-run", f"demo checkout not configured; {payload}"
+
     return _act(org, "fix_pr", cve, service, verdict, rationale, proof_path, rules or [],
-                lambda: ("dry-run", f"demo checkout not configured; {payload}"))
+                deliver, precheck)

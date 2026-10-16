@@ -3,7 +3,7 @@
 const $ = (id) => document.getElementById(id);
 const state = { triage: null, selected: 0, compare: null, config: {}, findings: null,
   services: [], changed: null };
-const cve = () => $("cve").value.trim();
+const cve = () => $("cve").value.trim().toUpperCase();
 const org = () => $("org").value;
 
 async function api(path, opts) {
@@ -186,6 +186,8 @@ function renderDetail() {
     `<span class="kv">owner <b>${esc(r.owner.team)}</b> ${esc(r.owner.slack_channel)} · last deploy ${esc(r.owner.last_deployer)}</span></p>` +
     `<p class="kv">risk <b>${r.risk.toFixed(2)}</b> = severity ${c.severity} × exposure ${c.exposure} × criticality ${c.criticality}` +
     ` · rules <b>${r.rules_fired.map(esc).join(", ")}</b> → ${esc(r.verdict_reason)}</p>` +
+    (r.centrality ? `<p class="kv">call graph (FalkorDB algo.pageRank / algo.betweenness): PageRank <b>#${r.centrality.rank}</b> of ${r.centrality.of} ` +
+      `(${r.centrality.pagerank}) · betweenness <b>${r.centrality.betweenness.toFixed(1)}</b> · called by ${r.centrality.in_degree}, calls ${r.centrality.out_degree}</p>` : "") +
     `<p class="explain">${esc(r.explanation)}</p>` +
     `<div class="chain">${route}` +
     `<div class="seg"><div class="seghead">2 · dependency chain ${ok(r.proof.verified)} <span class="kv">${esc(r.proof.detail)}</span></div>` +

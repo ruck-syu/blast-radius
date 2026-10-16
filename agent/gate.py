@@ -115,6 +115,12 @@ def markdown(r: dict) -> str:
         for f in r["resolved"]:
             after = f"now {f['after']}" if f["after"] else "no longer affected"
             out.append(f"- {f['cve']} on `{f['service']}`: was {f['before']}, {after}")
+        out.append("")
+    if r.get("carried"):
+        out += ["Still exposed through the added packages (already the case before this change):", ""]
+        for f in r["carried"]:
+            out.append(f"- {f['cve']} on `{f['service']}`: {f['verdict']} via "
+                       + " → ".join(f"`{x}`" for x in f["chain"]))
     return "\n".join(out).rstrip() + "\n"
 
 

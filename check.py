@@ -12,7 +12,7 @@ import time
 SUITES = [
     "mcp_server.test_tools", "agent.test_agent", "agent.test_simulation",
     "agent.test_actions", "mcp_server.test_apply", "agent.test_mcp_agent",
-    "agent.test_gate", "ui.test_ui",
+    "agent.test_gate", "ingest.test_osv", "ui.test_ui",
 ]
 
 

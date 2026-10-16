@@ -12,7 +12,9 @@ if some dependency path avoids every removed purl, and its evidence chain is
 that path. The live graph is never touched; the sandbox is always deleted.
 
 New transitive exposure is caught too: adding a package that DEPENDS_ON* a
-vulnerable one shows up with the full dependency chain as evidence.
+vulnerable one shows up with the full dependency chain as evidence. Exposure
+an added package carries that the service already had (an upgrade target that
+is itself vulnerable) is listed separately as `carried`.
 """
 from __future__ import annotations
 
@@ -128,6 +130,13 @@ def assess_change(service: str, adds: list[str] | None = None, expose_path: str 
                          "depth": a["depth"], "risk": a["risk"],
                          "chain": _chain(a["path"]),
                          "new_exposure": b is None})
+    # exposure the added packages carry that was already there before the change
+    # (not worse, so not a finding): an upgrade target that is itself vulnerable
+    added, flagged = set(direct) | set(pulled_in), {(f["cve"], f["service"]) for f in findings}
+    carried = [{"cve": cve, "service": svc, "verdict": a["verdict"], "chain": _chain(a["path"])}
+               for (cve, svc), a in after.items()
+               if svc == service and (cve, svc) not in flagged and added & set(_chain(a["path"]))]
+    carried.sort(key=lambda f: (-RANK[f["verdict"]], f["cve"]))
     resolved = []
     for (cve, svc), b in before.items():
         a = after.get((cve, svc))
@@ -144,6 +153,6 @@ def assess_change(service: str, adds: list[str] | None = None, expose_path: str 
             "unknown_packages": unknown,
             "removes": removed, "not_used": [p for p in removes if p not in removed],
             "expose_path": expose_path or None, "findings": findings, "worst": worst,
-            "resolved": resolved,
+            "resolved": resolved, "carried": carried,
             "cves_checked": len(cve_ids),
             "latency_ms": round((time.time() - t0) * 1000, 1)}

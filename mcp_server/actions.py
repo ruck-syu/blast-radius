@@ -198,7 +198,8 @@ def open_fix_pr(cve: str, service: str, verdict: str, rationale: str,
     Second guardrail after the proof check: the upgrade (service pins `fix`, or
     the CVE's fixed version, and stops resolving the vulnerable one) is applied
     to a sandbox graph copy first. Refused unless it resolves this CVE for this
-    service and opens no new ACT_NOW exposure; the sandbox result goes in the PR.
+    service and opens no new ACT_NOW exposure; the sandbox result goes in the PR,
+    with a warning when the target version still carries other CVEs.
 
     Live PR creation needs a demo-repo checkout to branch from, so the fix
     payload (upgrade + proof + sandbox check) is logged and a Decision node is
@@ -217,6 +218,7 @@ def open_fix_pr(cve: str, service: str, verdict: str, rationale: str,
                               for x in r["resolved"]],
                  "new_exposure": [f"{x['cve']} on {x['service']} -> {x['after']}"
                                   for x in r["findings"]],
+                 "still_exposed": [f"{x['cve']} ({x['verdict']})" for x in r["carried"]],
                  "latency_ms": r["latency_ms"]}
         if not any(x["cve"] == cve and x["service"] == service and x["after"] is None
                    for x in r["resolved"]):
@@ -232,7 +234,11 @@ def open_fix_pr(cve: str, service: str, verdict: str, rationale: str,
         payload = (f"FIX PR draft for {service}: {u['from']} -> {u['to']} ({cve}). "
                    f"Sandbox check ({fix_check['latency_ms']:.0f} ms): resolves "
                    f"{'; '.join(fix_check['resolves'])}; new exposure: "
-                   f"{'; '.join(fix_check['new_exposure']) or 'none'}. {rationale}")
+                   f"{'; '.join(fix_check['new_exposure']) or 'none'}. "
+                   + (f"Warning: {u['to']} is itself affected by "
+                      f"{', '.join(fix_check['still_exposed'])}; a later version is needed "
+                      "to clear those. " if fix_check["still_exposed"] else "")
+                   + rationale)
         return "dry-run", f"demo checkout not configured; {payload}"
 
     return _act(org, "fix_pr", cve, service, verdict, rationale, proof_path, rules or [],

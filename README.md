@@ -165,6 +165,9 @@ python -m agent.gate --sbom-before base.cdx.json --sbom-after pr.cdx.json
 Explicit `--adds`/`--removes PURL...` work too; `--expose PATH` for new public
 routes, `--fail-on SCHEDULE` to be stricter, `--json` for tooling. The live
 graph is never written; each run uses its own sandbox and deletes it.
+[`examples/ci/blast-radius-gate.yml`](examples/ci/blast-radius-gate.yml) is a
+GitHub Actions workflow for a service repo: syft SBOMs of base and PR, the
+gate, a sticky PR comment with the report, and a failed check on new ACT_NOW.
 
 Opening this repo in Claude Code offers the `blast-radius` MCP server from
 `.mcp.json` (approve it once); other MCP clients run

@@ -1,0 +1,50 @@
+# Blast Radius pre-merge gate for a service repo (copy to .github/workflows/).
+# SBOMs the base branch and the PR branch with syft, asks the org's FalkorDB graph
+# what the dependency diff does to exposure (sandbox copy, live graph untouched),
+# posts the report as a sticky PR comment, and fails the check on new ACT_NOW.
+# Not run in this repo (no remote); the gate itself is covered by agent/test_gate.py.
+name: blast-radius-gate
+on:
+  pull_request:
+    paths: ["**/package-lock.json", "**/pom.xml", "**/go.sum", "**/requirements*.txt", "**/Cargo.lock"]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: pr }
+      - uses: actions/checkout@v4
+        with: { ref: "${{ github.base_ref }}", path: base }
+      - uses: actions/checkout@v4
+        with: { repository: demo-org/blast-radius, path: blast-radius }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r blast-radius/requirements.txt
+      - uses: anchore/sbom-action/download-syft@v0
+      - name: SBOM base and PR
+        run: |
+          syft dir:base -o cyclonedx-json > base.cdx.json
+          syft dir:pr   -o cyclonedx-json > pr.cdx.json
+      - name: Gate
+        id: gate
+        working-directory: blast-radius
+        env:
+          FALKORDB_HOST: ${{ secrets.FALKORDB_HOST }}
+          FALKORDB_PORT: ${{ secrets.FALKORDB_PORT }}
+          FALKORDB_USERNAME: ${{ secrets.FALKORDB_USERNAME }}
+          FALKORDB_PASSWORD: ${{ secrets.FALKORDB_PASSWORD }}
+        run: |
+          set +e
+          python -m agent.gate --org prod --service "${{ github.event.repository.name }}" \
+            --sbom-before ../base.cdx.json --sbom-after ../pr.cdx.json > ../report.md
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+          cat ../report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with: { header: blast-radius, path: report.md }
+      - if: steps.gate.outputs.code != '0'
+        run: exit 1

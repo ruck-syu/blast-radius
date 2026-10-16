@@ -138,12 +138,13 @@ def simulate_fix(cve: str, fix: str, org: str = "dev") -> dict:
 
 @mcp.tool()
 def assess_change(service: str, adds: list[str] | None = None, expose_path: str = "",
-                  org: str = "dev") -> dict:
-    """Pre-merge check: what if `service` started using packages `adds` (purls) and/or a
-    new public endpoint `expose_path` routed to it? Runs in a sandbox graph copy and
-    returns every CVE verdict that gets worse, with the dependency chain. Read-only."""
+                  org: str = "dev", removes: list[str] | None = None) -> dict:
+    """Pre-merge check: what if `service` started using packages `adds` (purls), stopped
+    using `removes`, and/or a new public endpoint `expose_path` routed to it? Runs in a
+    sandbox graph copy and returns every CVE verdict that gets worse (with the dependency
+    chain) and every one the change resolves. Read-only."""
     from .assess import assess_change as _assess_change
-    return _assess_change(service, adds, expose_path, org)
+    return _assess_change(service, adds, expose_path, org, removes)
 
 
 @mcp.tool()

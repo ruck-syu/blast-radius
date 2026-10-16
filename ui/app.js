@@ -256,20 +256,28 @@ function fillLiveSvc() {
   let opts = [];
   if (t && t.known_cve) {
     const affected = new Set(t.results.map((r) => r.service));
+    const vRank = { ACT_NOW: 0, SCHEDULE: 1, SUPPRESS: 2 };
     opts = op === "expose"
       ? t.results.filter((r) => !r.reachable).map((r) => ({ name: r.service, tier: r.tier, note: r.verdict }))
+      : op === "pin"
+      ? (t.cve.fixed_purl ? t.results.map((r) => ({ name: r.service, tier: r.tier, note: r.verdict })) : [])
       : state.services.filter((s) => !affected.has(s.name)).map((s) => ({ ...s, note: "not affected" }));
-    opts.sort((a, b) => tierRank[a.tier] - tierRank[b.tier] || a.name.localeCompare(b.name));
+    opts.sort((a, b) => (op === "pin" ? vRank[a.note] - vRank[b.note] : 0)
+      || tierRank[a.tier] - tierRank[b.tier] || a.name.localeCompare(b.name));
   }
+  const none = { expose: "every affected service is already reachable", adopt: "no unaffected services",
+                 pin: "no fixed version in the graph" }[op];
   sel.innerHTML = opts.length ? opts.map((o) => `<option value="${esc(o.name)}">${esc(o.name)} · ${esc(o.tier)} · ${esc(o.note)}</option>`).join("")
-    : `<option value="">${op === "expose" ? "every affected service is already reachable" : "no unaffected services"}</option>`;
-  $("liveBtn").disabled = $("assessBtn").disabled = !opts.length;
+    : `<option value="">${none}</option>`;
+  $("assessBtn").disabled = !opts.length;
+  $("liveBtn").disabled = !opts.length || op === "pin";
+  $("liveBtn").title = op === "pin" ? "upgrades are simulated org-wide under Fix simulation; this checks one service's PR" : "";
 }
 
 function liveRequest() {
-  const t = state.triage, svc = $("liveSvc").value;
-  return $("liveOp").value === "expose"
-    ? { service: svc, expose: `/live/${svc}` }
+  const t = state.triage, svc = $("liveSvc").value, op = $("liveOp").value;
+  return op === "expose" ? { service: svc, expose: `/live/${svc}` }
+    : op === "pin" ? { service: svc, adds: [t.cve.fixed_purl], removes: [t.cve.vuln_purl] }
     : { service: svc, adds: [t.cve.vuln_purl] };
 }
 
@@ -283,7 +291,9 @@ async function assessLive() {
       `${r.latency_ms.toFixed(0)}ms · live graph untouched · ${r.worst === "ACT_NOW" ? "a pre-merge gate would <b>fail</b> this change" : "a pre-merge gate would pass this change"}</span>` +
       (r.findings.length ? r.findings.map((f) => `<div><b class="mono">${esc(f.cve)}</b> <b>${esc(f.service)}</b> ${pill(f.before)} → ${pill(f.after)} ` +
         `<span class="kv">${f.reachable ? `public via ${esc(f.entry_point)}` : "no public path"} · ${f.chain.map((x) => esc(x.split("/").pop())).join(" → ")}</span></div>`).join("")
-        : `<div class="kv">no verdict gets worse</div>`) + `</div>`;
+        : `<div class="kv">no verdict gets worse</div>`) +
+      (r.resolved || []).map((f) => `<div><b class="mono">${esc(f.cve)}</b> <b>${esc(f.service)}</b> ${pill(f.before)} → ${pill(f.after)} ` +
+        `<span class="okmark">resolved by this change ✓</span> <span class="kv">${f.after ? "" : "no dependency path left that avoids the removed version"}</span></div>`).join("") + `</div>`;
   } catch (e) { $("liveDiff").innerHTML = `<div class="refuse">${esc(e.message)}</div>`; }
   $("assessBtn").disabled = false;
 }

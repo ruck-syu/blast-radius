@@ -39,7 +39,7 @@ python -m agent.test_simulation      # Phase 4: fix comparison
 python -m agent.test_actions         # Phase 5: guardrail accept/refuse
 python -m mcp_server.test_apply      # incremental updates + revert
 python -m agent.test_mcp_agent       # MCP agent: tool discovery, trace, verdict/proof checks (scripted LLM, no key)
-python -m agent.test_gate            # pre-merge gate: sandbox assess, transitive pulls, live graph untouched
+python -m agent.test_gate            # pre-merge gate: sandbox assess, transitive pulls, upgrades, SBOM diff, live graph untouched
 python -m ui.test_ui                 # UI API: triage, SSE investigate, approve, refusal drill, live change
 python -m benchmark.runner --org all # Phase 7: 3 systems, held-out numbers
 python -m ui.server                  # Phase 6: http://127.0.0.1:8765
@@ -120,7 +120,7 @@ Tools (all parameterized Cypher from `queries/`, see below):
 
 | When | Entry point | What happens |
 |------|-------------|--------------|
-| A PR changes dependencies or routes | `python -m agent.gate` in CI | the change is applied to a sandbox copy of the graph, every CVE re-scored; exit 1 with a markdown PR comment if it opens new ACT_NOW exposure (transitive pulls included) |
+| A PR changes dependencies or routes | `python -m agent.gate` in CI (base vs PR CycloneDX SBOMs, or explicit purls) | the change is applied to a sandbox copy of the graph, every CVE re-scored; exit 1 with a markdown PR comment if it opens new ACT_NOW exposure (transitive pulls included); upgrades are credited with what they resolve |
 | A new CVE lands | `python -m agent.triage` / `agent.mcp_agent` / the UI | blast radius, public routes, verdicts, owners, each with a verified proof |
 | Verdicts are in | `python -m agent.act`, or Approve in the UI | tickets + owner notifications, refused without a verified proof |
 | Choosing what to fix first | Simulate fixes / `simulate_fix` | each upgrade re-scored in a sandbox copy; biggest org-wide risk drop wins |
@@ -137,9 +137,34 @@ python -m agent.gate --service d-billing-worker --adds pkg:npm/syn-d-pkg-03519@1
 ```
 
 In CI, point `FALKORDB_HOST`/`PORT`/`USERNAME`/`PASSWORD` at the org's graph and
-run the gate with the service and the purls the PR adds (`--expose PATH` for
-new public routes, `--fail-on SCHEDULE` to be stricter, `--json` for tooling).
-The live graph is never written; each run uses its own sandbox and deletes it.
+diff the SBOMs of the base branch and the PR branch (syft/cdxgen output, any
+CycloneDX JSON):
+
+```bash
+python -m agent.gate --sbom-before base.cdx.json --sbom-after pr.cdx.json
+```
+
+The service comes from `metadata.component.name`. Components only in the PR
+SBOM are adds (new direct dependencies first, so the rest of a flattened
+subtree is recognised as pulled in and the report keeps the real transitive
+chain); components only in the base SBOM are removes: the service no longer
+resolves them, so a (CVE, service) pair survives only if some dependency path
+avoids every removed version. An upgrade PR therefore passes with
+"resolves N" and lists what it fixes:
+
+```bash
+python -m agent.sbom d-recommend-api > base.cdx.json     # stand-in for syft, from the graph
+python -m agent.sbom d-recommend-api \
+  --drop pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1 \
+  --add  pkg:maven/org.apache.logging.log4j/log4j-core@2.17.1 > pr.cdx.json
+python -m agent.gate --sbom-before base.cdx.json --sbom-after pr.cdx.json
+# ## Blast Radius pre-merge check: PASS: no new exposure, resolves 1
+# - CVE-2021-44228 on `d-recommend-api`: was ACT_NOW, no longer affected
+```
+
+Explicit `--adds`/`--removes PURL...` work too; `--expose PATH` for new public
+routes, `--fail-on SCHEDULE` to be stricter, `--json` for tooling. The live
+graph is never written; each run uses its own sandbox and deletes it.
 
 Opening this repo in Claude Code offers the `blast-radius` MCP server from
 `.mcp.json` (approve it once); other MCP clients run
@@ -187,12 +212,14 @@ Every query the product depends on lives in [`queries/`](queries/) (one file
 per traversal, one-line purpose comment each). Core traversals:
 `find_affected_services`, `check_reachability`, `dependency_path`,
 `score_risk` (risk formula in Cypher), `evaluate_rules` (named rules in
-Cypher), `rank_criticality` (FalkorDB `algo.pageRank` + `algo.betweenness`
-over the CALLS graph, procedure names verified live), plus guardrail
+Cypher), `rank_criticality` (FalkorDB `algo.pageRank` + exact
+`algo.betweenness` over the CALLS graph, procedure names verified live; triage
+cites each affected service's rank), plus guardrail
 (`verify_edge`, `verify_path_start`, `verify_path_cve_anchor`,
 `write_decision`), simulation (`upgrade_path`, `upgrade_uses`,
 `upgrade_depends`, `remove_fixed_affects`), incremental updates (`apply_*`,
-`list_live_changes`, `revert_live_*`), pre-merge checks (`package_exists`),
+`list_live_changes`, `revert_live_*`), pre-merge checks (`package_exists`, `service_resolves`,
+`dependency_path_avoiding`, `service_sbom`),
 and UI helpers (`get_cve`, `list_cves`, `list_services`, `list_decisions`,
 `call_graph_edges`).
 Depth bounds are literals injected after int validation — FalkorDB

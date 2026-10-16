@@ -19,6 +19,7 @@ Routes:
                                 one event per tool call with its reason, then checked findings
   GET  /api/action_log?n=100    tail of the action log (accepts + refusals)
   GET  /api/services?org=       every service (name, tier)
+  GET  /api/posture?org=        every CVE rolled up by service and vulnerable package
   GET  /api/live?org=           live changes currently applied (agent.live)
   POST /api/live                {op: expose|adopt, service, cve?, org?} mutate the live graph
   POST /api/live_revert         {org?} remove every live change
@@ -39,6 +40,7 @@ from urllib.parse import urlparse, parse_qs
 
 from agent.triage import triage
 from ingest import osv
+from mcp_server.posture import org_posture
 from agent.compare import compare_fixes
 from agent.act import act
 from agent import live
@@ -134,6 +136,9 @@ class Handler(BaseHTTPRequestHandler):
                     "slack_live": bool(os.getenv("SLACK_WEBHOOK"))})
             if url.path == "/api/investigate":
                 return self._investigate(qs)
+            if url.path == "/api/posture":
+                return _json(self, org_posture(qs.get("org", ["dev"])[0],
+                                               int(qs.get("limit", ["10"])[0])))
             if url.path == "/api/services":
                 return _json(self, {"services": live.services(qs.get("org", ["dev"])[0])})
             if url.path == "/api/live":

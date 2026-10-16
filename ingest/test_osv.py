@@ -14,6 +14,7 @@ from agent.testkit import isolated_actions
 from agent.triage import triage
 from mcp_server import graph
 from mcp_server.actions import open_fix_pr
+from mcp_server.posture import org_posture
 from mcp_server.simulate import list_cves
 from ingest.config import graph_name
 from . import osv
@@ -96,6 +97,12 @@ def main() -> None:
         check("fix PR accepted (resolves its CVE) but warns the target is still exposed",
               fx["accepted"] and "CVE-2018-11776 (ACT_NOW)" in fx["fix_check"]["still_exposed"]
               and "Warning:" in fx["target"])
+        pz = org_posture("dev", limit=100)
+        sp = next(x for x in pz["packages"] if x["purl"] == STRUTS + "2.3.31")
+        check("posture: struts upgrade target flagged as itself affected (KEV)",
+              sp["upgrade_to"] == STRUTS + "2.5.10.1" and any(
+                  c["cve"] == "CVE-2018-11776" and c["in_kev"] for c in sp["target_affected_by"])
+              and pz["cves"] == len(cves_before) + 2, str(sp["target_affected_by"]))
     finally:
         r = osv.remove("dev")
     check("remove restores the graph", r["removed"] == 2

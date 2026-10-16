@@ -60,6 +60,10 @@ def main() -> None:
         check("triage has verified exposure routes",
               reach and all(r["exposure"]["verified"] for r in reach), f"{len(reach)} reachable")
 
+        pz = get("/api/posture?org=dev&limit=3")
+        check("posture roll-up", pz["cves"] == len(cves) and len(pz["services"]) == 3
+              and pz["packages"] and pz["act_now_pairs"] > 0, f"{pz['act_now_pairs']} ACT_NOW")
+
         server.AGENT_LLM = None
         cfg = get("/api/config")
         if not cfg["agent_llm"]:

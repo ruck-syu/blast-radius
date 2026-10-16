@@ -44,7 +44,7 @@ MAX_TURNS = 30
 
 READ_TOOLS = {"get_cve", "find_affected_services", "check_reachability", "dependency_path",
               "rank_criticality", "find_owner", "score_risk", "evaluate_rules", "simulate_fix",
-              "assess_change"}
+              "assess_change", "org_posture"}
 ACTION_TOOLS = {"create_ticket", "notify_owner", "open_fix_pr"}
 
 SYSTEM = """You are Blast Radius, a software supply-chain triage agent. Your only view \
@@ -156,6 +156,9 @@ def _brief(tool: str, r: dict | None) -> str:
         return "top: " + ", ".join(x["service"] for x in r["ranking"][:3])
     if tool == "simulate_fix" and r.get("reduction"):
         return f"risk reduction {r['reduction'].get('total_risk')}"
+    if tool == "org_posture" and r.get("services"):
+        return (f"{r['act_now_pairs']} ACT_NOW pairs across {r['cves']} CVEs; "
+                f"top {r['services'][0]['service']}")
     if tool == "assess_change":
         f = r.get("findings", [])
         return ((f"{len(f)} verdicts worse, worst {r.get('worst')}" if f

@@ -103,3 +103,4 @@ svg.map .edge.hl { stroke:var(--acc); stroke-width:2; }
 .ok { border:1px solid var(--supp); border-radius:6px; padding:8px; margin:8px 0; }
 .loge { border-bottom:1px solid var(--line); padding:5px 0; font-size:13px; }
 pre.imported { margin:6px 0 0; padding:8px 10px; background:var(--bg); border:1px solid var(--line); border-radius:6px; font-size:12px; white-space:pre-wrap; overflow-wrap:anywhere; }
+a.cvelink { color:var(--acc); text-decoration:none; font-family:ui-monospace,monospace; } a.cvelink:hover { text-decoration:underline; }

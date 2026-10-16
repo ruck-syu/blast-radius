@@ -42,7 +42,8 @@ ROOT = Path(__file__).resolve().parent.parent
 MAX_TURNS = 30
 
 READ_TOOLS = {"get_cve", "find_affected_services", "check_reachability", "dependency_path",
-              "rank_criticality", "find_owner", "score_risk", "evaluate_rules", "simulate_fix"}
+              "rank_criticality", "find_owner", "score_risk", "evaluate_rules", "simulate_fix",
+              "assess_change"}
 ACTION_TOOLS = {"create_ticket", "notify_owner", "open_fix_pr"}
 
 SYSTEM = """You are Blast Radius, a software supply-chain triage agent. Your only view \
@@ -154,6 +155,11 @@ def _brief(tool: str, r: dict | None) -> str:
         return "top: " + ", ".join(x["service"] for x in r["ranking"][:3])
     if tool == "simulate_fix" and r.get("reduction"):
         return f"risk reduction {r['reduction'].get('total_risk')}"
+    if tool == "assess_change":
+        f = r.get("findings", [])
+        return (f"{len(f)} verdicts worse, worst {r.get('worst')}" if f
+                else "no new exposure") + (f"; unknown {r['unknown_packages']}"
+                                           if r.get("unknown_packages") else "")
     if "accepted" in r:
         return "accepted" if r["accepted"] else f"REFUSED: {r.get('reason')}"
     return ""

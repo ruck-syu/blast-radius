@@ -261,7 +261,29 @@ function fillLiveSvc() {
   }
   sel.innerHTML = opts.length ? opts.map((o) => `<option value="${esc(o.name)}">${esc(o.name)} · ${esc(o.tier)} · ${esc(o.note)}</option>`).join("")
     : `<option value="">${op === "expose" ? "every affected service is already reachable" : "no unaffected services"}</option>`;
-  $("liveBtn").disabled = !opts.length;
+  $("liveBtn").disabled = $("assessBtn").disabled = !opts.length;
+}
+
+function liveRequest() {
+  const t = state.triage, svc = $("liveSvc").value;
+  return $("liveOp").value === "expose"
+    ? { service: svc, expose: `/live/${svc}` }
+    : { service: svc, adds: [t.cve.vuln_purl] };
+}
+
+async function assessLive() {
+  $("assessBtn").disabled = true;
+  $("liveDiff").innerHTML = "<p class='hint'>copying the graph into a sandbox, applying the change there, re-scoring every CVE…</p>";
+  try {
+    const r = await post("/api/assess", { ...liveRequest(), org: org() });
+    const pill = (v) => v ? `<span class="pill ${v}">${v}</span>` : `<span class="kv">not affected</span>`;
+    $("liveDiff").innerHTML = `<div class="diff"><b>Sandbox prediction</b> <span class="kv">${r.cves_checked} CVEs re-scored in a copy of the graph · ` +
+      `${r.latency_ms.toFixed(0)}ms · live graph untouched · ${r.worst === "ACT_NOW" ? "a pre-merge gate would <b>fail</b> this change" : "a pre-merge gate would pass this change"}</span>` +
+      (r.findings.length ? r.findings.map((f) => `<div><b class="mono">${esc(f.cve)}</b> <b>${esc(f.service)}</b> ${pill(f.before)} → ${pill(f.after)} ` +
+        `<span class="kv">${f.reachable ? `public via ${esc(f.entry_point)}` : "no public path"} · ${f.chain.map((x) => esc(x.split("/").pop())).join(" → ")}</span></div>`).join("")
+        : `<div class="kv">no verdict gets worse</div>`) + `</div>`;
+  } catch (e) { $("liveDiff").innerHTML = `<div class="refuse">${esc(e.message)}</div>`; }
+  $("assessBtn").disabled = false;
 }
 
 async function refreshLive() {
@@ -302,7 +324,7 @@ function diffTriage(before, after, what) {
 
 async function liveChange(req, label) {
   const before = state.triage;
-  $("liveBtn").disabled = $("revertBtn").disabled = true;
+  $("liveBtn").disabled = $("assessBtn").disabled = $("revertBtn").disabled = true;
   try {
     const out = await post(req.path, req.body);
     await runTriage(true);
@@ -391,6 +413,7 @@ $("triageBtn").addEventListener("click", () => runTriage());
 $("cve").addEventListener("keydown", (e) => { if (e.key === "Enter") runTriage(); });
 $("org").addEventListener("change", () => { loadCves(); loadServices(); runTriage(); });
 $("liveOp").addEventListener("change", fillLiveSvc);
+$("assessBtn").addEventListener("click", assessLive);
 $("liveBtn").addEventListener("click", () => liveChange(
   { path: "/api/live", body: { op: $("liveOp").value, service: $("liveSvc").value, cve: cve(), org: org() } },
   (out) => out.summary));

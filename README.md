@@ -39,7 +39,8 @@ python -m agent.test_simulation      # Phase 4: fix comparison
 python -m agent.test_actions         # Phase 5: guardrail accept/refuse
 python -m mcp_server.test_apply      # incremental updates + revert
 python -m agent.test_mcp_agent       # MCP agent: tool discovery, trace, verdict/proof checks (scripted LLM, no key)
-python -m ui.test_ui                 # UI API: triage, SSE investigate, approve, refusal drill
+python -m agent.test_gate            # pre-merge gate: sandbox assess, transitive pulls, live graph untouched
+python -m ui.test_ui                 # UI API: triage, SSE investigate, approve, refusal drill, live change
 python -m benchmark.runner --org all # Phase 7: 3 systems, held-out numbers
 python -m ui.server                  # Phase 6: http://127.0.0.1:8765
 ```
@@ -96,8 +97,9 @@ vulnerable package → CVE.
   *Approve* acts only on ACT_NOW findings that pass both checks: a human in
   the loop on top of the guardrail. Disabled with a note when no key is set.
 - **Live change**: expose a service to the internet or make a service adopt
-  the vulnerable package; the live graph changes through `apply_change`, the
-  page re-triages and shows what flipped (e.g. SCHEDULE → ACT_NOW with the new
+  the vulnerable package. *Check in sandbox* predicts the outcome the way the
+  pre-merge gate does; *Apply* changes the live graph through `apply_change`,
+  re-triages and shows what flipped (e.g. SCHEDULE → ACT_NOW with the new
   route verified). Revert removes exactly those changes (provenance-tagged).
 - **Fix simulation**, **Actions** (ticket + notify, guardrail drill with a
   forged proof), **Decisions** recorded in the graph, and the **Action log**.
@@ -105,12 +107,43 @@ vulnerable package → CVE.
 API (documented in the `ui/server.py` docstring): `GET /api/triage`,
 `/api/compare`, `/api/cves`, `/api/config`, `/api/decisions`,
 `/api/action_log`, `/api/services`, `/api/live`, `/api/investigate` (SSE);
-`POST /api/act`, `/api/refusal_drill`, `/api/live`, `/api/live_revert`.
+`POST /api/act`, `/api/refusal_drill`, `/api/live`, `/api/live_revert`,
+`/api/assess`.
 
 Tools (all parameterized Cypher from `queries/`, see below):
 `get_cve`, `find_affected_services`, `check_reachability`, `dependency_path`,
 `rank_criticality`, `find_owner`, `score_risk`, `evaluate_rules`,
-`simulate_fix`, `apply_change`, `create_ticket`, `notify_owner`, `open_fix_pr`.
+`simulate_fix`, `assess_change`, `apply_change`, `create_ticket`, `notify_owner`,
+`open_fix_pr`.
+
+## Where it fits in the workflow
+
+| When | Entry point | What happens |
+|------|-------------|--------------|
+| A PR changes dependencies or routes | `python -m agent.gate` in CI | the change is applied to a sandbox copy of the graph, every CVE re-scored; exit 1 with a markdown PR comment if it opens new ACT_NOW exposure (transitive pulls included) |
+| A new CVE lands | `python -m agent.triage` / `agent.mcp_agent` / the UI | blast radius, public routes, verdicts, owners, each with a verified proof |
+| Verdicts are in | `python -m agent.act`, or Approve in the UI | tickets + owner notifications, refused without a verified proof |
+| Choosing what to fix first | Simulate fixes / `simulate_fix` | each upgrade re-scored in a sandbox copy; biggest org-wide risk drop wins |
+| Ad-hoc questions | Claude Code (`.mcp.json` in this repo) or any MCP client | the same graph tools, the model picks which to call |
+
+Pre-merge gate, for a PR that makes `d-billing-worker` depend on a package
+that pulls log4j-core 2.14.1 in two hops down:
+
+```bash
+python -m agent.gate --service d-billing-worker --adds pkg:npm/syn-d-pkg-03519@1.19.5
+# ## Blast Radius pre-merge check: FAIL: new ACT_NOW exposure
+# | CVE-2021-44228 | d-billing-worker | not affected → ACT_NOW | public via /api/d/v1/route-02; ... |
+# exit 1
+```
+
+In CI, point `FALKORDB_HOST`/`PORT`/`USERNAME`/`PASSWORD` at the org's graph and
+run the gate with the service and the purls the PR adds (`--expose PATH` for
+new public routes, `--fail-on SCHEDULE` to be stricter, `--json` for tooling).
+The live graph is never written; each run uses its own sandbox and deletes it.
+
+Opening this repo in Claude Code offers the `blast-radius` MCP server from
+`.mcp.json` (approve it once); other MCP clients run
+`python -m mcp_server.server` from the repo root over stdio.
 
 ## Graph data model
 
@@ -158,8 +191,10 @@ Cypher), `rank_criticality` (FalkorDB `algo.pageRank` + `algo.betweenness`
 over the CALLS graph, procedure names verified live), plus guardrail
 (`verify_edge`, `verify_path_start`, `verify_path_cve_anchor`,
 `write_decision`), simulation (`upgrade_path`, `upgrade_uses`,
-`upgrade_depends`, `remove_fixed_affects`), incremental updates (`apply_*`),
-and UI helpers (`get_cve`, `list_cves`, `list_decisions`, `call_graph_edges`).
+`upgrade_depends`, `remove_fixed_affects`), incremental updates (`apply_*`,
+`list_live_changes`, `revert_live_*`), pre-merge checks (`package_exists`),
+and UI helpers (`get_cve`, `list_cves`, `list_services`, `list_decisions`,
+`call_graph_edges`).
 Depth bounds are literals injected after int validation — FalkorDB
 variable-length bounds cannot be query parameters, and the agent never writes
 free-form Cypher against the live graph.

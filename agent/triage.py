@@ -2,7 +2,8 @@
 
 Plan (deterministic; LLM used only for the final summary wording):
   1. get_cve      - CVE metadata + vulnerable/fixed purls (unknown-CVE guard)
-  2. score_risk   - ranked affected services with risk components + paths
+  2. score_risk   - ranked affected services with risk components + paths;
+     rank_criticality - PageRank + betweenness over the call graph (context per service)
   3. per service: evaluate_rules + find_owner
   4. verify each proof path (chain integrity + endpoints match CVE/service); for
      reachable services also fetch + verify the shortest public route (check_reachability)
@@ -74,6 +75,7 @@ def get_cve(cve: str, org: str) -> dict | None:
 
 def triage(cve_id: str, org: str = "dev", use_llm: bool = True) -> dict:
     t0 = time.time()
+    cve_id = cve_id.strip().upper()
     plan: list[dict] = []
 
     def step(tool: str, result: dict) -> dict:
@@ -87,6 +89,8 @@ def triage(cve_id: str, org: str = "dev", use_llm: bool = True) -> dict:
                 "plan": plan, "total_latency_ms": round((time.time() - t0) * 1000, 1)}
 
     scored = step("score_risk", score_risk(cve_id, org))
+    central = step("rank_criticality", rank_criticality(org, limit=100))["ranking"]
+    rank_of = {c["service"]: dict(c, rank=i + 1, of=len(central)) for i, c in enumerate(central)}
     results = []
     for item in scored["ranked"]:
         svc = item["service"]
@@ -112,6 +116,10 @@ def triage(cve_id: str, org: str = "dev", use_llm: bool = True) -> dict:
             f"{item['exposure']:.1f}x{item['criticality']:.2f} -> {verdict} "
             f"({why}; fired: {', '.join(fired)}). Owner {owner.get('team')} "
             f"({owner.get('slack_channel')}), last deployed by {owner.get('last_deployer')}.")
+        cg = rank_of.get(svc)
+        if cg:
+            explanation += (f" Call-graph PageRank #{cg['rank']} of {cg['of']} "
+                            f"(called by {cg['in_degree']}, calls {cg['out_degree']}).")
         results.append({
             "service": svc, "tier": item["tier"], "depth": item["depth"],
             "risk": item["risk"],
@@ -125,6 +133,7 @@ def triage(cve_id: str, org: str = "dev", use_llm: bool = True) -> dict:
                       "deployed_at": owner.get("deployed_at")},
             "proof": {"path": item["path"], "verified": ok, "detail": reason},
             "exposure": exposure,
+            "centrality": cg,
             "explanation": explanation,
         })
 

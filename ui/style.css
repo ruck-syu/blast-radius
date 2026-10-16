@@ -26,6 +26,7 @@ main { padding:16px 24px; display:flex; flex-direction:column; gap:16px; max-wid
 .card h3 { font-size:13px; margin:16px 0 6px; color:var(--muted); }
 .cols { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.25fr); gap:16px; }
 @media (max-width:1000px){ .cols{ grid-template-columns:1fr; } }
+@media (max-width:520px){ .row{ flex-wrap:wrap; } .row .pill{ min-width:0; } #map{ overflow-x:auto; } svg.map{ min-width:820px; } .controls select{ max-width:100%; } }
 .hidden { display:none; }
 .hint { color:var(--muted); }
 .small-label { font-size:12px; font-weight:400; display:inline-flex; gap:4px; align-items:center; }
@@ -38,14 +39,14 @@ main { padding:16px 24px; display:flex; flex-direction:column; gap:16px; max-wid
   border-radius:6px; margin-bottom:6px; cursor:pointer; }
 .row:hover { background:#1c2129; }
 .row.sel { border-color:var(--acc); background:#1c2129; }
-.svcname { min-width:130px; }
+.svcname { flex:1 1 120px; min-width:0; overflow-wrap:anywhere; }
 .row .pill { min-width:84px; text-align:center; }
-.tags { margin-left:auto; display:flex; gap:4px; }
+.tags { margin-left:auto; display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; }
 .tag { font-size:10px; border:1px solid var(--line); border-radius:4px; padding:0 5px; color:var(--muted); }
 .tag.pub { border-color:var(--supp); color:var(--supp); }
 .pill { font-size:11px; font-weight:700; padding:2px 8px; border-radius:99px; white-space:nowrap; }
 .ACT_NOW { background:var(--act); } .SCHEDULE { background:var(--sched); color:#111; } .SUPPRESS { background:var(--supp); color:#111; }
-.riskbar { height:8px; background:#21262d; border-radius:4px; flex:0 0 90px; }
+.riskbar { height:8px; background:#21262d; border-radius:4px; flex:0 1 90px; min-width:36px; }
 .riskbar i { display:block; height:8px; border-radius:4px; background:var(--acc); }
 .mono { font-family:ui-monospace,monospace; font-size:12px; }
 .kv { color:var(--muted); }

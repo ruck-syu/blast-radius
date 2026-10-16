@@ -30,7 +30,8 @@ python -m ingest.load --all     # ~22k nodes / ~39k edges per graph
 python -m ingest.verify --org dev && python -m ingest.verify --org heldout
 ```
 
-Verify each phase (all must print ALL PASS / ACCEPTANCE PASS):
+Verify each phase (all must print ALL PASS / ACCEPTANCE PASS), or run them
+all with `python check.py` (one PASS/FAIL line per suite, failing output shown):
 
 ```bash
 python -m mcp_server.test_tools      # Phase 2: read tools vs ground truth

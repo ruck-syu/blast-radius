@@ -398,8 +398,7 @@ There are two separate graphs, `blast_radius_dev` (seed 42) and
 - [x] Complete local setup, with FalkorDB Cloud supported through `.env` (see [Quick start](#quick-start))
 - [ ] Demo video, to be recorded from [`docs/demo-script.md`](docs/demo-script.md) (7 steps, ~6 min)
 
-More: [`DECISIONS.md`](DECISIONS.md) (design choices and what was rejected),
-[`AI_USAGE.md`](AI_USAGE.md) (every AI tool used and for what).
+More: [`DECISIONS.md`](DECISIONS.md) (design choices and what was rejected).
 
 ## Related work
 

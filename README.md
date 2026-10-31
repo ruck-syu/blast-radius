@@ -3,7 +3,7 @@
 **An agent that triages software supply-chain vulnerabilities by reasoning over
 a FalkorDB graph.**
 
-Give it a CVE ID and it:
+Give it a CVE ID and it :
 
 1. finds every service that pulls in the vulnerable package, through any number
    of transitive dependencies;
